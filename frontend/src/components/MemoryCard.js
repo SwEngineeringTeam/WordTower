@@ -3,13 +3,21 @@ import React, { useState, useEffect } from 'react';
 const themeColor = '#29B6F6';
 
 const fetchWords = async () => {
-  const response = await fetch('/api/words/daily?limit=10');
-  if (!response.ok) throw new Error('단어를 불러오지 못했습니다.');
-  return response.json();
+  const response = await fetch(`http://localhost:8080/api/words/daily?limit=10&t=${new Date().getTime()}`);
+
+  if (!response.ok) {
+    throw new Error('단어를 불러오지 못했습니다.');
+  }
+
+  const data = await response.json();
+  console.log('받아온 단어 데이터:', data);
+
+  return Array.isArray(data) ? data : [];
 };
 
 const DifficultyStars = ({ difficulty }) => {
-  const level = difficulty + 1;
+  const parsed = Number(difficulty);
+  const level = Number.isFinite(parsed) ? parsed + 1 : 1;
   return (
     <div style={{ display: 'flex', gap: '3px' }}>
       {[1, 2, 3, 4, 5].map(i => (
@@ -171,6 +179,21 @@ function CardScreen({ onHome }) {
   );
 
   const word = words[current];
+  if (!word) {
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '100vh',
+      fontFamily: "'Noto Sans KR', sans-serif",
+      color: '#888',
+      fontSize: '14px'
+    }}>
+      표시할 단어가 없습니다.
+    </div>
+  );
+}
 
   const flipCard = (e) => {
     e?.stopPropagation();
