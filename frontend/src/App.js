@@ -1,17 +1,33 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import WordManager from './components/WordManager'; // 파일 위치가 다르면 경로를 꼭 확인하세요!
+import WordManager from './components/WordManager';
+import MemoryCard from './components/MemoryCard';
 
-// 1. 대문이 될 메인 페이지 (Home)
 const Home = () => (
   <div style={{ textAlign: 'center', marginTop: '100px', fontFamily: 'Arial' }}>
     <h1 style={{ fontSize: '3rem', color: '#2563eb' }}>Word Tower 🗼</h1>
     <p>토익 정복을 위한 똑똑한 단어장</p>
-    <div style={{ marginTop: '30px' }}>
+    <div style={{ marginTop: '30px', display: 'flex', justifyContent: 'center', gap: '15px' }}>
+      {/* 1. 메모리카드 학습 버튼 (새로 추가됨) */}
+      <Link to="/memory">
+        <button style={{
+          padding: '12px 24px',
+          fontSize: '1rem',
+          fontWeight: 'bold',
+          cursor: 'pointer',
+          backgroundColor: '#29B6F6', // 원하셨던 하늘색 포인트
+          color: 'white',
+          border: 'none',
+          borderRadius: '8px',
+          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+        }}>
+          오늘의 단어 학습하기 🎴
+        </button>
+      </Link>
       <Link to="/admin">
-        <button style={{ 
-          padding: '12px 24px', 
-          fontSize: '1rem', 
+        <button style={{
+          padding: '12px 24px',
+          fontSize: '1rem',
           cursor: 'pointer',
           backgroundColor: '#2563eb',
           color: 'white',
@@ -25,16 +41,13 @@ const Home = () => (
   </div>
 );
 
-// 2. 전체 페이지 길 안내 (Routing)
 function App() {
   return (
     <Router>
       <Routes>
-        {/* http://localhost:3000 접속 시 */}
         <Route path="/" element={<Home />} />
-        
-        {/* http://localhost:3000/admin 접속 시 */}
         <Route path="/admin" element={<WordManager />} />
+        <Route path="/memory" element={<MemoryCard />} />
       </Routes>
     </Router>
   );

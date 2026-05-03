@@ -22,6 +22,10 @@ public class WordController {
     public List<Word> getAllWords() {
         return wordService.findAll();
     }
+    @GetMapping("/daily")
+    public List<Word> getDailyWords(@RequestParam(defaultValue = "10") int limit) {
+        return wordService.findRandom(limit);  // wordRepository 대신 wordService 통해 호출
+    }
 
     @PostMapping
     public Word createWord(@RequestBody Word word) {
