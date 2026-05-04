@@ -30,8 +30,8 @@ public class StreakController {
             @PathVariable Long userId,
             @RequestBody QuizSubmitRequest request) { 
         
-        // QuizRecord의 totalCount(전체 문제 수)가 0보다 크면 퀴즈를 완료한 것으로 인정합니다.
-        boolean quizCompleted = request.getTotalCount() > 0; 
+        // QuizRecord의 correctCount(맞힌 문제 수)가 0보다 크면 퀴즈를 완료한 것으로 인정합니다.
+        boolean quizCompleted = request.getCorrectCount() > 0; 
 
         // 스트릭 갱신 서비스 호출
         streakService.updateUserStreak(userId, quizCompleted);
