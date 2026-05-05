@@ -58,7 +58,7 @@ const HomePage = () => {
               ) : (
                 <Link to="/user">
                   <button
-                    style={{ ...buttonStyle, backgroundColor: "#f59e0b" }}
+                    style={{ ...buttonStyle, backgroundColor: "#55a0d6" }}
                   >
                     오늘의 단어 학습하기
                   </button>
