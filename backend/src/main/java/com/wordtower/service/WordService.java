@@ -21,8 +21,8 @@ public class WordService {
     public List<Word> findAll() {
         return wordRepository.findAll();
     }
-    public List<Word> findRandom(int limit) {
-        return wordRepository.findRandomWords(limit);
+    public List<Word> findRandomByDifficulty(String difficulty, int limit) {
+        return wordRepository.findRandomWordsByDifficulty(difficulty, limit);
     }
     // [여기에 추가!] 오늘의 단어 10개를 무작위로 가져오는 로직
     public List<Word> findDailyWords(int limit) {

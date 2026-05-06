@@ -23,8 +23,11 @@ public class WordController {
         return wordService.findAll();
     }
     @GetMapping("/daily")
-    public List<Word> getDailyWords(@RequestParam(defaultValue = "10") int limit) {
-        return wordService.findRandom(limit);  // wordRepository 대신 wordService 통해 호출
+    public List<Word> getDailyWords(
+            @RequestParam(defaultValue = "1") String difficulty,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        return wordService.findRandomByDifficulty(difficulty, limit);
     }
 
     @PostMapping

@@ -22,6 +22,8 @@ public class User {
 
     private String nickname;
 
+    private int difficulty = 1;
+
     private int currentStreak = 0;
     private int longestStreak = 0;
     private LocalDateTime lastActivityDate;

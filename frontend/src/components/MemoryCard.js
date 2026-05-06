@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const themeColor = '#29B6F6';
 
-const fetchWords = async () => {
-  const response = await fetch(`http://localhost:8080/api/words/daily?limit=10&t=${new Date().getTime()}`);
+const fetchWords = async (difficulty = 1) => {
+  const response = await fetch(
+    `http://localhost:8080/api/words/daily?difficulty=${difficulty}&limit=10&t=${new Date().getTime()}`
+  );
 
   if (!response.ok) {
     throw new Error('단어를 불러오지 못했습니다.');
@@ -17,7 +20,7 @@ const fetchWords = async () => {
 
 const DifficultyStars = ({ difficulty }) => {
   const parsed = Number(difficulty);
-  const level = Number.isFinite(parsed) ? parsed + 1 : 1;
+  const level = Number.isFinite(parsed) ? parsed : 1;
   return (
     <div style={{ display: 'flex', gap: '3px' }}>
       {[1, 2, 3, 4, 5].map(i => (
@@ -27,15 +30,11 @@ const DifficultyStars = ({ difficulty }) => {
   );
 };
 
-// 점 네비게이터
-const DotNav = ({ total, current, results }) => (
+// 점 네비게이터 (색상 없이 현재 위치만 파란색)
+const DotNav = ({ total, current }) => (
   <div style={{ display: 'flex', gap: '6px', alignItems: 'center', justifyContent: 'center' }}>
     {Array.from({ length: total }).map((_, i) => {
-      const result = results[i];
-      let bg = '#E0E0E0';
-      if (i === current) bg = themeColor;
-      else if (result === 'correct') bg = '#4CAF50';
-      else if (result === 'wrong') bg = '#EF5350';
+      const bg = i === current ? themeColor : '#E0E0E0';
       return (
         <div key={i} style={{
           width: i === current ? '10px' : '8px',
@@ -78,9 +77,7 @@ function HomeScreen({ onStart }) {
 }
 
 // 결과 화면
-function ResultScreen({ words, results, onRestart, onHome }) {
-  const correctCount = Object.values(results).filter(r => r === 'correct').length;
-  const wrongCount = Object.values(results).filter(r => r === 'wrong').length;
+function ResultScreen({ words, onRestart, onHome }) {
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center',
@@ -92,31 +89,18 @@ function ResultScreen({ words, results, onRestart, onHome }) {
         <h2 style={{ fontSize: '22px', fontWeight: '600', color: '#111', margin: '0 0 8px' }}>학습 완료!</h2>
         <p style={{ fontSize: '14px', color: '#888', margin: 0 }}>오늘의 단어 {words.length}개를 모두 학습했어요</p>
       </div>
-      <div style={{ display: 'flex', gap: '12px' }}>
-        <div style={{ textAlign: 'center', backgroundColor: '#E8F5E9', borderRadius: '12px', padding: '16px 28px' }}>
-          <div style={{ fontSize: '28px', fontWeight: '600', color: '#388E3C' }}>{correctCount}</div>
-          <div style={{ fontSize: '12px', color: '#66BB6A', marginTop: '4px' }}>알고 있어요</div>
-        </div>
-        <div style={{ textAlign: 'center', backgroundColor: '#FFEBEE', borderRadius: '12px', padding: '16px 28px' }}>
-          <div style={{ fontSize: '28px', fontWeight: '600', color: '#C62828' }}>{wrongCount}</div>
-          <div style={{ fontSize: '12px', color: '#EF5350', marginTop: '4px' }}>모르겠어요</div>
-        </div>
-      </div>
       <div style={{ width: '100%', maxWidth: '560px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {words.map((w, i) => (
           <div key={i} style={{
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             backgroundColor: '#FFFFFF', borderRadius: '10px',
-            border: `1px solid ${results[i] === 'correct' ? '#A5D6A7' : results[i] === 'wrong' ? '#EF9A9A' : '#E5E7EB'}`,
+            border: '1px solid #E5E7EB',
             padding: '12px 16px',
           }}>
             <div>
               <span style={{ fontWeight: '500', color: '#111', fontSize: '15px' }}>{w.word}</span>
               <span style={{ color: '#AAA', fontSize: '13px', marginLeft: '10px' }}>{w.meaning}</span>
             </div>
-            <span style={{ fontSize: '16px' }}>
-              {results[i] === 'correct' ? '✅' : results[i] === 'wrong' ? '❌' : ''}
-            </span>
           </div>
         ))}
       </div>
@@ -134,14 +118,13 @@ function ResultScreen({ words, results, onRestart, onHome }) {
 
 // 메인 카드 화면
 function CardScreen({ onHome }) {
+  const navigate = useNavigate();
   const [words, setWords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [current, setCurrent] = useState(0);
   const [flipped, setFlipped] = useState(false);
-  const [results, setResults] = useState({});  // { index: 'correct' | 'wrong' }
   const [showResult, setShowResult] = useState(false);
-  const [pressedBtn, setPressedBtn] = useState(null); // 눌림 효과용
 
   useEffect(() => {
     fetchWords()
@@ -154,9 +137,7 @@ function CardScreen({ onHome }) {
     setError(null);
     setCurrent(0);
     setFlipped(false);
-    setResults({});
     setShowResult(false);
-    setPressedBtn(null);
     fetchWords()
       .then(data => { setWords(data); setLoading(false); })
       .catch(err => { setError(err.message); setLoading(false); });
@@ -175,25 +156,29 @@ function CardScreen({ onHome }) {
   );
 
   if (showResult) return (
-    <ResultScreen words={words} results={results} onRestart={handleRestart} onHome={onHome} />
+    <ResultScreen
+      words={words}
+      onRestart={handleRestart}
+      onHome={() => navigate("/")}
+    />
   );
 
   const word = words[current];
   if (!word) {
-  return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: '100vh',
-      fontFamily: "'Noto Sans KR', sans-serif",
-      color: '#888',
-      fontSize: '14px'
-    }}>
-      표시할 단어가 없습니다.
-    </div>
-  );
-}
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        fontFamily: "'Noto Sans KR', sans-serif",
+        color: '#888',
+        fontSize: '14px'
+      }}>
+        표시할 단어가 없습니다.
+      </div>
+    );
+  }
 
   const flipCard = (e) => {
     e?.stopPropagation();
@@ -204,16 +189,9 @@ function CardScreen({ onHome }) {
     if (current < words.length - 1) {
       setCurrent(c => c + 1);
       setFlipped(false);
-      setPressedBtn(null);
     } else {
       setShowResult(true);
     }
-  };
-
-  const handleAnswer = (result) => {
-    setPressedBtn(result);
-    setResults(prev => ({ ...prev, [current]: result }));
-    setTimeout(() => goNext(), 500);
   };
 
   const cardFaceBase = {
@@ -235,7 +213,7 @@ function CardScreen({ onHome }) {
       {/* 상단 홈버튼 + 카운트 */}
       <div style={{ width: '100%', maxWidth: '560px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <button
-          onClick={onHome}
+          onClick={() => navigate("/")}
           style={{
             width: '36px', height: '36px', borderRadius: '50%',
             border: '1px solid #E5E7EB', backgroundColor: '#FFFFFF',
@@ -253,7 +231,7 @@ function CardScreen({ onHome }) {
       </div>
 
       {/* 점 네비게이터 */}
-      <DotNav total={words.length} current={current} results={results} />
+      <DotNav total={words.length} current={current} />
 
       {/* 카드 */}
       <div
@@ -302,7 +280,7 @@ function CardScreen({ onHome }) {
       {/* 네비게이션 화살표 */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
         <button
-          onClick={(e) => { e.stopPropagation(); if (current > 0) { setCurrent(c => c - 1); setFlipped(false); setPressedBtn(results[current - 1] || null); } }}
+          onClick={(e) => { e.stopPropagation(); if (current > 0) { setCurrent(c => c - 1); setFlipped(false); } }}
           style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid #E5E7EB', backgroundColor: '#FFFFFF', fontSize: '20px', fontFamily: "'Helvetica Neue', sans-serif", fontWeight: '200', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#555' }}
         >
           &#8249;
@@ -315,47 +293,11 @@ function CardScreen({ onHome }) {
         </button>
       </div>
 
-      {/* 알고/모르고 버튼 */}
-      <div style={{ display: 'flex', gap: '10px', width: '100%', maxWidth: '560px' }}>
-        <button
-          onClick={() => handleAnswer('wrong')}
-          style={{
-            flex: 1, padding: '13px 0', borderRadius: '10px', border: 'none',
-            fontSize: '13px', fontWeight: '500', cursor: 'pointer',
-            transition: 'all 0.15s ease',
-            backgroundColor: pressedBtn === 'wrong' ? '#EF5350' : results[current] === 'wrong' ? '#FFCDD2' : '#FFFFFF',
-            color: pressedBtn === 'wrong' ? '#FFFFFF' : results[current] === 'wrong' ? '#C62828' : '#C62828',
-            outline: pressedBtn === 'wrong' ? 'none' : '1px solid #EF5350',
-            transform: pressedBtn === 'wrong' ? 'scale(0.97)' : 'scale(1)',
-            boxShadow: pressedBtn === 'wrong' ? '0 2px 8px rgba(239,83,80,0.35)' : 'none',
-          }}
-        >
-          모르겠어요
-        </button>
-        <button
-          onClick={() => handleAnswer('correct')}
-          style={{
-            flex: 1, padding: '13px 0', borderRadius: '10px', border: 'none',
-            fontSize: '13px', fontWeight: '500', cursor: 'pointer',
-            transition: 'all 0.15s ease',
-            backgroundColor: pressedBtn === 'correct' ? '#4CAF50' : results[current] === 'correct' ? '#C8E6C9' : '#FFFFFF',
-            color: pressedBtn === 'correct' ? '#FFFFFF' : results[current] === 'correct' ? '#388E3C' : '#388E3C',
-            outline: pressedBtn === 'correct' ? 'none' : '1px solid #4CAF50',
-            transform: pressedBtn === 'correct' ? 'scale(0.97)' : 'scale(1)',
-            boxShadow: pressedBtn === 'correct' ? '0 2px 8px rgba(76,175,80,0.35)' : 'none',
-          }}
-        >
-          알고 있어요
-        </button>
-      </div>
     </div>
   );
 }
 
 // 루트 앱
-export default function App() {
-  const [screen, setScreen] = useState('home'); // 'home' | 'card'
-
-  if (screen === 'home') return <HomeScreen onStart={() => setScreen('card')} />;
-  return <CardScreen onHome={() => setScreen('home')} />;
+export default function MemoryCard() {
+  return <CardScreen />;
 }

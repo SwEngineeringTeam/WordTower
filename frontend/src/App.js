@@ -1,6 +1,9 @@
 
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+// 페이지 컴포넌트들 (위치에 맞게 import)
+import Homepage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
 import WordManager from './components/WordManager';
 import MemoryCard from './components/MemoryCard';
 
@@ -10,7 +13,7 @@ const Home = () => (
     <p>토익 정복을 위한 똑똑한 단어장</p>
     <div style={{ marginTop: '30px', display: 'flex', justifyContent: 'center', gap: '15px' }}>
       {/* 1. 메모리카드 학습 버튼 (새로 추가됨) */}
-      <Link to="/memory">
+      <Link to="/user">
         <button style={{
           padding: '12px 24px',
           fontSize: '1rem',
@@ -42,10 +45,7 @@ const Home = () => (
   </div>
 );
 
-// 페이지 컴포넌트들 (위치에 맞게 import)
-import Homepage from "./pages/HomePage";
-import LoginPage from "./pages/LoginPage";
-import WordManager from "./components/WordManager"; // 기존 관리자 컴포넌트
+
 function App() {
   return (
     <Router>
@@ -60,8 +60,7 @@ function App() {
         {/* 3. 관리자 페이지: 기존 WordManager 연결 */}
         <Route path="/admin" element={<WordManager />} />
 
-        {/* 4. (선택) 일반 유저용 대시보드가 있다면 추가 */}
-        {/* <Route path="/user" element={<UserDashboard />} /> */}
+        <Route path="/user" element={<MemoryCard />} />
       </Routes>
     </Router>
   );
