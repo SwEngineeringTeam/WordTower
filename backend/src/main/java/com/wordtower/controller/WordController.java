@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import com.wordtower.domain.UserWord;
+import com.wordtower.dto.WrongWordRequest;
 
 /**
  * WordController: 프론트엔드의 요청을 받아 처리 결과를 반환합니다.
@@ -28,6 +30,16 @@ public class WordController {
             @RequestParam(defaultValue = "10") int limit
     ) {
         return wordService.findRandomByDifficulty(difficulty, limit);
+    }
+    @GetMapping("/wrong")
+    public List<Word> getWrongWords(
+            @RequestParam(defaultValue = "5") int limit
+    ) {
+        return wordService.findWrongWords(limit);
+    }
+    @PostMapping("/wrong")
+    public UserWord saveWrongWord(@RequestBody WrongWordRequest request) {
+        return wordService.saveWrongWord(request);
     }
 
     @PostMapping

@@ -6,6 +6,8 @@ import Homepage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import WordManager from './components/WordManager';
 import MemoryCard from './components/MemoryCard';
+import DailyQuiz from "./components/DailyQuiz";
+
 
 const Home = () => (
   <div style={{ textAlign: 'center', marginTop: '100px', fontFamily: 'Arial' }}>
@@ -61,6 +63,8 @@ function App() {
         <Route path="/admin" element={<WordManager />} />
 
         <Route path="/user" element={<MemoryCard />} />
+
+        <Route path="/DailyQuiz" element={<DailyQuiz />} />
       </Routes>
     </Router>
   );

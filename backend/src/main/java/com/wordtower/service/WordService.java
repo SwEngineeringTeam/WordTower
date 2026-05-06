@@ -7,6 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import com.wordtower.domain.UserWord;
+import com.wordtower.dto.WrongWordRequest;
+import com.wordtower.repository.UserWordRepository;
+import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 /**
  * WordService: 단어 관리의 핵심 로직을 처리합니다.
@@ -17,12 +22,27 @@ import java.util.List;
 public class WordService {
 
     private final WordRepository wordRepository;
+    private final UserWordRepository userWordRepository;
 
     public List<Word> findAll() {
         return wordRepository.findAll();
     }
     public List<Word> findRandomByDifficulty(String difficulty, int limit) {
         return wordRepository.findRandomWordsByDifficulty(difficulty, limit);
+    }
+    public List<Word> findWrongWords(int limit) {
+    List<UserWord> wrongWords = userWordRepository.findWrongWords(limit);
+
+        return wrongWords.stream()
+                .map(userWord -> {
+                    Word word = new Word();
+                    word.setId(userWord.getId());
+                    word.setWord(userWord.getSpelling());
+                    word.setMeaning(userWord.getMeaning());
+                    word.setDifficulty("1");
+                    return word;
+                })
+                .collect(Collectors.toList());
     }
     // [여기에 추가!] 오늘의 단어 10개를 무작위로 가져오는 로직
     public List<Word> findDailyWords(int limit) {
@@ -37,6 +57,7 @@ public class WordService {
                 .limit(limit)
                 .collect(java.util.stream.Collectors.toList());
     }
+
     @Transactional
     public Word save(Word word) {
         return wordRepository.save(word);
@@ -54,11 +75,26 @@ public class WordService {
         word.setDifficulty(wordDetails.getDifficulty());
 
         return word;
-}
+    }
 
     @Transactional
     public void delete(Long id) {
         wordRepository.deleteById(id);
     }
-    
+    @Transactional
+    public UserWord saveWrongWord(WrongWordRequest request) {
+        UserWord userWord = userWordRepository
+                .findBySpellingNative(request.getWord())
+                .orElseGet(UserWord::new);
+
+        userWord.setSpelling(request.getWord());
+        userWord.setMeaning(request.getMeaning());
+        
+        userWord.setLastWrongDate(LocalDateTime.now());
+        userWord.setWrong(true);
+
+        userWord.setWrongCount(userWord.getWrongCount() + 1);
+
+        return userWordRepository.save(userWord);
+    }
 }

@@ -24,4 +24,7 @@ public interface WordRepository extends JpaRepository<Word, Long> {
             @Param("difficulty") String difficulty,
             @Param("limit") int limit
     );
+    // 오답 단어가 아직 없을 때 임시로 랜덤 단어 n개 조회
+    @Query(value = "SELECT * FROM word ORDER BY RAND() LIMIT :limit", nativeQuery = true)
+    List<Word> findWrongWordsTemp(@Param("limit") int limit);
 }

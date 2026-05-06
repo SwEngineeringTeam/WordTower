@@ -5,8 +5,8 @@ const themeColor = '#29B6F6';
 
 const fetchWords = async (difficulty = 1) => {
   const response = await fetch(
-    `http://localhost:8080/api/words/daily?difficulty=${difficulty}&limit=10&t=${new Date().getTime()}`
-  );
+   `/api/words/daily?difficulty=${difficulty}&limit=10&t=${new Date().getTime()}`
+);
 
   if (!response.ok) {
     throw new Error('단어를 불러오지 못했습니다.');
@@ -77,7 +77,8 @@ function HomeScreen({ onStart }) {
 }
 
 // 결과 화면
-function ResultScreen({ words, onRestart, onHome }) {
+// 결과 화면
+function ResultScreen({ words, onRestart, onHome, onQuiz }) {   // ← onQuiz 추가
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center',
@@ -94,8 +95,7 @@ function ResultScreen({ words, onRestart, onHome }) {
           <div key={i} style={{
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             backgroundColor: '#FFFFFF', borderRadius: '10px',
-            border: '1px solid #E5E7EB',
-            padding: '12px 16px',
+            border: '1px solid #E5E7EB', padding: '12px 16px',
           }}>
             <div>
               <span style={{ fontWeight: '500', color: '#111', fontSize: '15px' }}>{w.word}</span>
@@ -104,12 +104,17 @@ function ResultScreen({ words, onRestart, onHome }) {
           </div>
         ))}
       </div>
+
+      {/* ↓ 버튼 3개로 변경 */}
       <div style={{ display: 'flex', gap: '10px', width: '100%', maxWidth: '560px' }}>
         <button onClick={onHome} style={{ flex: 1, padding: '12px 0', borderRadius: '10px', border: '1px solid #E5E7EB', backgroundColor: '#FFFFFF', fontSize: '14px', cursor: 'pointer', color: '#555' }}>
           홈으로
         </button>
-        <button onClick={onRestart} style={{ flex: 1, padding: '12px 0', borderRadius: '10px', border: 'none', backgroundColor: themeColor, color: '#FFFFFF', fontSize: '14px', cursor: 'pointer', fontWeight: '500' }}>
+        <button onClick={onRestart} style={{ flex: 1, padding: '12px 0', borderRadius: '10px', border: 'none', backgroundColor: '#29B6F6', color: '#FFFFFF', fontSize: '14px', cursor: 'pointer', fontWeight: '500' }}>
           다시 학습
+        </button>
+        <button onClick={onQuiz} style={{ flex: 1, padding: '12px 0', borderRadius: '10px', border: 'none', backgroundColor: '#FF7043', color: '#FFFFFF', fontSize: '14px', cursor: 'pointer', fontWeight: '500' }}>
+          📝 퀴즈 시작
         </button>
       </div>
     </div>
@@ -160,6 +165,7 @@ function CardScreen({ onHome }) {
       words={words}
       onRestart={handleRestart}
       onHome={() => navigate("/")}
+      onQuiz={() => navigate("/DailyQuiz", { state: { words } })}
     />
   );
 
