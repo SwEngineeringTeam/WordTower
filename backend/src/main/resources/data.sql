@@ -1,3 +1,10 @@
+-- 유저 데이터
+-- 데이터가 이미 있으면 무시하고, 없으면 넣음 (Duplicate 에러 방지)
+INSERT IGNORE INTO users(id, email, password, nickname, current_streak, longest_streak, last_activity_date, role, unlocked_units) VALUES
+(1, 'admin@test.com', '1234', 'Tower Admin', 0, 0, NULL, 'ADMIN', 1),
+(2, 'user@test.com', '1234', 'Tower Learner', 0, 0, NULL, 'USER', 1);
+
+-- 단어 데이터
 INSERT INTO word (difficulty, example, meaning, word) VALUES (0, 'You can apply for the job online.', '지원하다', 'Apply');
 INSERT INTO word (difficulty, example, meaning, word) VALUES (0, 'Please read the notice on the wall.', '공고, 통지', 'Notice');
 INSERT INTO word (difficulty, example, meaning, word) VALUES (0, 'All staff members must attend the meeting.', '직원', 'Staff');

@@ -11,11 +11,11 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const data = await login(email, password);
-      if (data.role === "ADMIN") {
+      const user_data = await login(email, password);
+      if (user_data.role === "ADMIN") {
         navigate("/admin");
       } else {
-        navigate("/");
+        navigate("/user");
       }
     } catch (err) {
       alert(err);

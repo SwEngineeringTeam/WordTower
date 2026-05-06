@@ -1,3 +1,3 @@
 package com.wordtower.dto;
 
-public record LoginResponse(String token, String role) {}
+public record LoginResponse(Long userId, String token, String role, String nickname) {}

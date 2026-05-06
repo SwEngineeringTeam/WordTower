@@ -62,9 +62,6 @@ public class StreakService {
         user.setLongestStreak(newLongestStreak);
         user.setLastActivityDate(nowKst.toLocalDateTime()); // KST 시간 저장
         userRepository.save(user);
-
-        // 테스트용 출력 (코드 리뷰용, 추후 주석 처리 가능)
-        System.out.println(user.getNickname() + " (" + user.getId() + ")의 현재 스트릭은 " + user.getCurrentStreak() + " 일입니다.");
     }
 
     

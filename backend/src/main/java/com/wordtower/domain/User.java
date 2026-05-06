@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter @Setter
 @NoArgsConstructor
-@Table(name = "users") // user는 DB 예약어인 경우가 많아 테이블명을 지정하는 것이 안전합니다.
+@Table(name = "users") 
 public class User {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,6 +25,10 @@ public class User {
     private int currentStreak = 0;
     private int longestStreak = 0;
     private LocalDateTime lastActivityDate;
+
+    // [추가] 사용자가 현재 열어둔 유닛 (기본값: 1)
+    @Column(nullable = false, columnDefinition = "int default 1")
+    private int unlockedUnits = 1; 
 
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;

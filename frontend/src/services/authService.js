@@ -11,6 +11,8 @@ export const login = async (email, password) => {
     if (response.data.token) {
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("role", response.data.role); // 'ADMIN' 또는 'USER'
+      localStorage.setItem("userId", response.data.userId);
+      localStorage.setItem("nickname", response.data.nickname || "");
     }
 
     return response.data;

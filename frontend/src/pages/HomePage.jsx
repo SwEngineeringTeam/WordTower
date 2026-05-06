@@ -38,9 +38,8 @@ const HomePage = () => {
           /* 2. 로그인을 했을 때 (토큰이 있을 때) */
           <>
             <p style={{ fontWeight: "bold", fontSize: "1.2rem" }}>
-              반갑습니다,{" "}
-              <span style={{ color: "#2563eb" }}>
-                {role === "ADMIN" ? "관리자" : "유저"}
+              반갑습니다, <span style={{ color: "#2563eb" }}>
+                {localStorage.getItem("nickname") || (role === "ADMIN" ? "관리자" : "유저")}
               </span>
               님!
             </p>
