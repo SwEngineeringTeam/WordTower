@@ -48,33 +48,7 @@ const DotNav = ({ total, current }) => (
   </div>
 );
 
-// 홈 화면
-function HomeScreen({ onStart }) {
-  return (
-    <div style={{
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      minHeight: '100vh', backgroundColor: '#F9FAFB',
-      fontFamily: "'Noto Sans KR', sans-serif", gap: '2rem', padding: '2rem',
-    }}>
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: '48px', marginBottom: '12px' }}>📖</div>
-        <h1 style={{ fontSize: '28px', fontWeight: '600', color: '#111', margin: '0 0 8px' }}>WordTower</h1>
-        <p style={{ fontSize: '14px', color: '#888', margin: 0 }}>오늘의 단어 10개를 학습해보세요</p>
-      </div>
-      <button
-        onClick={onStart}
-        style={{
-          backgroundColor: themeColor, color: '#FFFFFF',
-          border: 'none', borderRadius: '12px',
-          padding: '14px 48px', fontSize: '16px', fontWeight: '500',
-          cursor: 'pointer',
-        }}
-      >
-        시작하기
-      </button>
-    </div>
-  );
-}
+
 
 // 결과 화면
 // 결과 화면
