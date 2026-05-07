@@ -62,4 +62,9 @@ public class WordController {
         wordService.delete(id);
         return ResponseEntity.ok().build();
     }
+    @DeleteMapping("/wrong/{wordId}")
+    public ResponseEntity<Void> deleteWrongWord(@PathVariable Long wordId) {
+        wordService.deleteWrongWord(wordId);
+        return ResponseEntity.ok().build();
+    }
 }
