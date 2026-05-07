@@ -26,12 +26,11 @@ function App() {
 
         {/* 3. 일반 유저 메인 대시보드 */}
         <Route path="/user" element={<UserMainPage />} />
-        <Route path="/quiz/:unitId" element={<QuizPage />} />
+        <Route path="/quiz/:unitId" element={<DailyQuiz />} />
 
         {/* 4. 관리자 페이지 */}
         <Route path="/admin" element={<WordManager />} />
         <Route path="/memory-card" element={<MemoryCard />} />
-        <Route path="/DailyQuiz" element={<DailyQuiz />} />
       </Routes>
     </Router>
   );

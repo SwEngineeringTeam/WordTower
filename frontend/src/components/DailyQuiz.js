@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { submitQuizAndUpdateStreak } from "../services/streakService";
 
 const themeColor = '#29B6F6';
 
@@ -194,6 +195,9 @@ function ResultScreen({ results, quizWords, onRetry, onHome }) {
 export default function DailyQuiz() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { unitId } = useParams();
+
+  const userId = localStorage.getItem("userId") || "1";
   const todayWords = location.state?.words ?? [];
 
   const [quizWords, setQuizWords] = useState([]);
@@ -238,7 +242,7 @@ export default function DailyQuiz() {
       results={results}
       quizWords={quizWords}
       onRetry={handleRetry}
-      onHome={() => navigate('/')}
+      onHome={() => navigate('/user')}
     />
   );
 
@@ -261,13 +265,36 @@ export default function DailyQuiz() {
   };
 
   // 다음 문제
-  const handleNext = () => {
+  const handleNext = async () => {
     if (current < quizWords.length - 1) {
       setCurrent(c => c + 1);
-      setInput(''); setSubmitted(false); setIsCorrect(null);
-    } else {
-      setShowResult(true);
+      setInput('');
+      setSubmitted(false);
+      setIsCorrect(null);
+      return;
     }
+
+    if (!userId) {
+      navigate("/login");
+      return;
+    }
+
+    // 프론트 화면 반영용: 다음 유닛 열기
+    const nextUnit = Number(unitId) + 1;
+    localStorage.setItem("unlockedUnits", String(nextUnit));
+
+    // 프론트 화면 반영용: 스트릭 1 증가
+    const currentLocalStreak = Number(localStorage.getItem("streak")) || 0;
+    localStorage.setItem("streak", String(currentLocalStreak + 1));
+
+    try {
+      const result = await submitQuizAndUpdateStreak(Number(userId), Number(unitId));
+      console.log("퀴즈 완료 → unit/streak 갱신 성공:", result);
+    } catch (error) {
+      console.error("백엔드 갱신 실패. 프론트에는 임시 반영됨:", error);
+    }
+
+    setShowResult(true);
   };
 
   const handleKeyDown = (e) => {
@@ -279,7 +306,7 @@ export default function DailyQuiz() {
 
       {/* 상단 바 */}
       <div style={S.topBar}>
-        <button onClick={() => navigate('/')} style={S.iconBtn}>⌂</button>
+        <button onClick={() => navigate('/user')} style={S.iconBtn}>⌂</button>
         <div style={{ fontSize: '14px', color: '#888' }}>
           <span style={{ fontWeight: '500', color: '#111' }}>{current + 1}</span>
           <span> / {quizWords.length}</span>

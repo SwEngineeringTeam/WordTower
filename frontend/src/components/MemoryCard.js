@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useLocation } from 'react-router-dom';
 
 const themeColor = '#29B6F6';
 
@@ -98,6 +98,8 @@ function ResultScreen({ words, onRestart, onHome, onQuiz }) {   // ← onQuiz �
 // 메인 카드 화면
 function CardScreen({ onHome }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const unitId = location.state?.unitId || 1;
   const [words, setWords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -139,7 +141,7 @@ function CardScreen({ onHome }) {
       words={words}
       onRestart={handleRestart}
       onHome={() => navigate("/user")}
-      onQuiz={() => navigate("/DailyQuiz", { state: { words } })}
+      onQuiz={() => navigate(`/quiz/${unitId}`, { state: { words } })}
     />
   );
 

@@ -35,7 +35,11 @@ const UserMainPage = () => {
 
         // 2. DB에서 유닛 진도 가져오기
         const progress = await getUserProgress(Number(userId));
-        setUnlockedUnits(progress);
+
+        const localProgress = parseInt(localStorage.getItem("unlockedUnits")) || 1;
+        const finalProgress = Math.max(Number(progress) || 1, localProgress);
+
+        setUnlockedUnits(finalProgress);
         
       } catch (err) {
         console.error("데이터 조회 오류:", err);
@@ -137,7 +141,7 @@ const UserMainPage = () => {
                 </div>
                 <button
                   className="primary-action"
-                  onClick={() => navigate("/memory-card")}
+                  onClick={() => navigate("/memory-card", { state: { unitId: unlockedUnits } })}
                 >
                   현재 유닛 학습 시작
                 </button>
