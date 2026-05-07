@@ -137,7 +137,7 @@ const UserMainPage = () => {
                 </div>
                 <button
                   className="primary-action"
-                  onClick={() => navigate(`/quiz/${unlockedUnits}`)}
+                  onClick={() => navigate("/memory-card")}
                 >
                   현재 유닛 학습 시작
                 </button>
