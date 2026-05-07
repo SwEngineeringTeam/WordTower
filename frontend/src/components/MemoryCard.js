@@ -138,7 +138,7 @@ function CardScreen({ onHome }) {
     <ResultScreen
       words={words}
       onRestart={handleRestart}
-      onHome={() => navigate("/")}
+      onHome={() => navigate("/user")}
       onQuiz={() => navigate("/DailyQuiz", { state: { words } })}
     />
   );
@@ -193,7 +193,7 @@ function CardScreen({ onHome }) {
       {/* 상단 홈버튼 + 카운트 */}
       <div style={{ width: '100%', maxWidth: '560px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/user")}
           style={{
             width: '36px', height: '36px', borderRadius: '50%',
             border: '1px solid #E5E7EB', backgroundColor: '#FFFFFF',
