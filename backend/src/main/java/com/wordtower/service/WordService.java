@@ -27,8 +27,12 @@ public class WordService {
     public List<Word> findAll() {
         return wordRepository.findAll();
     }
-    public List<Word> findRandomByDifficulty(String difficulty, int limit) {
-        return wordRepository.findRandomWordsByDifficulty(difficulty, limit);
+    public List<Word> findRandomByDifficulty(String unitId, int limit) {
+        int unit = Integer.parseInt(unitId);
+        int difficultyNum = (unit - 1) / 5;          // unit 1~5 → 0, unit 6~10 → 1
+        int offset = ((unit - 1) % 5) * limit;        // 0, 10, 20, 30, 40
+        String difficulty = String.valueOf(difficultyNum); // int → String 변환
+        return wordRepository.findWordsByDifficultyOrdered(difficulty, limit, offset);
     }
     public List<Word> findWrongWords(int limit) {
     List<UserWord> wrongWords = userWordRepository.findWrongWords(limit);

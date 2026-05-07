@@ -26,10 +26,10 @@ public class WordController {
     }
     @GetMapping("/daily")
     public List<Word> getDailyWords(
-            @RequestParam(defaultValue = "1") String difficulty,
+            @RequestParam(defaultValue = "1") String unitId,
             @RequestParam(defaultValue = "10") int limit
     ) {
-        return wordService.findRandomByDifficulty(difficulty, limit);
+        return wordService.findRandomByDifficulty(unitId, limit);
     }
     @GetMapping("/wrong")
     public List<Word> getWrongWords(

@@ -215,7 +215,11 @@ export default function DailyQuiz() {
   // 퀴즈 단어 로딩 (오늘 단어 + 오답 5개)
   const loadQuiz = (baseWords) => {
     fetchWrongWords(5)
-      .then((wrongWords) => setQuizWords(shuffle([...baseWords, ...wrongWords])))
+      .then((wrongWords) => {
+        const solvedIds = JSON.parse(localStorage.getItem("solvedWrongIds") || "[]");
+        const filtered = wrongWords.filter(w => !solvedIds.includes(w.id)); // 맞힌 단어 제외
+        setQuizWords(shuffle([...baseWords, ...filtered]));
+      })
       .catch(()          => setQuizWords(shuffle([...baseWords])))
       .finally(()        => setLoading(false));
   };
@@ -261,6 +265,11 @@ export default function DailyQuiz() {
       saveWrongWord(q).catch(() => {});
     } else if (q.id) {
       deleteWrongWord(q.id).catch(() => {});
+      // 맞힌 단어를 다음 퀴즈 로딩 시 제외하기 위해 로컬에 기록
+      const solved = JSON.parse(localStorage.getItem("solvedWrongIds") || "[]");
+      if (!solved.includes(q.id)) {
+        localStorage.setItem("solvedWrongIds", JSON.stringify([...solved, q.id]));
+      }
     }
   };
 

@@ -3,10 +3,10 @@ import { useNavigate,useLocation } from 'react-router-dom';
 
 const themeColor = '#29B6F6';
 
-const fetchWords = async (difficulty = 1) => {
+const fetchWords = async (unitId = 1) => {
   const response = await fetch(
-   `/api/words/daily?difficulty=${difficulty}&limit=10&t=${new Date().getTime()}`
-);
+    `/api/words/daily?unitId=${unitId}&limit=10`
+  );
 
   if (!response.ok) {
     throw new Error('단어를 불러오지 못했습니다.');
@@ -20,7 +20,7 @@ const fetchWords = async (difficulty = 1) => {
 
 const DifficultyStars = ({ difficulty }) => {
   const parsed = Number(difficulty);
-  const level = Number.isFinite(parsed) ? parsed : 1;
+  const level = Number.isFinite(parsed) ? parsed + 1 : 1;
   return (
     <div style={{ display: 'flex', gap: '3px' }}>
       {[1, 2, 3, 4, 5].map(i => (
@@ -99,7 +99,8 @@ function ResultScreen({ words, onRestart, onHome, onQuiz }) {   // ← onQuiz �
 function CardScreen({ onHome }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const unitId = location.state?.unitId || 1;
+  const params = new URLSearchParams(location.search);
+  const unitId = params.get('unitId') || location.state?.unitId || 1;
   const [words, setWords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -108,10 +109,10 @@ function CardScreen({ onHome }) {
   const [showResult, setShowResult] = useState(false);
 
   useEffect(() => {
-    fetchWords()
+    fetchWords(unitId)
       .then(data => { setWords(data); setLoading(false); })
       .catch(err => { setError(err.message); setLoading(false); });
-  }, []);
+  }, [unitId]);
 
   const handleRestart = () => {
     setLoading(true);
@@ -119,7 +120,7 @@ function CardScreen({ onHome }) {
     setCurrent(0);
     setFlipped(false);
     setShowResult(false);
-    fetchWords()
+    fetchWords(unitId)   // ← unitId 전달
       .then(data => { setWords(data); setLoading(false); })
       .catch(err => { setError(err.message); setLoading(false); });
   };

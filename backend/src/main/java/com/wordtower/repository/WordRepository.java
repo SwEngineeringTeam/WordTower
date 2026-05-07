@@ -14,9 +14,12 @@ import java.util.List;
 @Repository
 public interface WordRepository extends JpaRepository<Word, Long> {
 
-    // 랜덤으로 n개 단어 조회
-    @Query(value = "SELECT * FROM word ORDER BY RAND() LIMIT :limit", nativeQuery = true)
-    List<Word> findRandomWords(@Param("limit") int limit);
+    @Query(value = "SELECT * FROM word WHERE difficulty = :difficulty ORDER BY id ASC LIMIT :limit OFFSET :offset", nativeQuery = true)
+    List<Word> findWordsByDifficultyOrdered(
+            @Param("difficulty") String difficulty,
+            @Param("limit") int limit,
+            @Param("offset") int offset
+    );
 
     // 특정 난이도(difficulty)의 단어 중에서 랜덤으로 n개 조회
     @Query(value = "SELECT * FROM word WHERE difficulty = :difficulty ORDER BY RAND() LIMIT :limit", nativeQuery = true)
