@@ -53,8 +53,7 @@ const UserMainPage = () => {
   }, [navigate, userId]);
 
   // 수정 후
-  const onUnitClick = (unitNum) => {
-    if (unitNum <= unlockedUnits) {
+
   const onUnitClick = (unitNum) => {
     if (unitNum <= unlockedUnits) {
       navigate(`/memory-card?unitId=${unitNum}`);

@@ -93,4 +93,8 @@ public class WordService {
 
         return userWordRepository.save(userWord);
     }
+    @Transactional
+    public void deleteWrongWord(Long wordId) {
+        // wordId에 해당하는 오답 기록 삭제 또는 오답 상태 해제 로직
+    }
 }
