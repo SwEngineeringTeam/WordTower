@@ -46,6 +46,13 @@ public class WordController {
     public Word createWord(@RequestBody Word word) {
         return wordService.save(word);
     }
+    @GetMapping("/unit")
+    public List<Word> getWordsByUnit(
+        @RequestParam(defaultValue = "1") int unitId,
+        @RequestParam(defaultValue = "10") int limit
+    ) {
+        return wordService.findWordsByUnit(unitId, limit);
+    }
 
     @PutMapping("/{id}")
     public ResponseEntity<Word> updateWord(@PathVariable Long id, @RequestBody Word wordDetails) {
@@ -62,9 +69,11 @@ public class WordController {
         wordService.delete(id);
         return ResponseEntity.ok().build();
     }
+
     @DeleteMapping("/wrong/{wordId}")
     public ResponseEntity<Void> deleteWrongWord(@PathVariable Long wordId) {
         wordService.deleteWrongWord(wordId);
         return ResponseEntity.ok().build();
     }
+
 }

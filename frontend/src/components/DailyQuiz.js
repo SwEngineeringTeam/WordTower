@@ -212,16 +212,23 @@ export default function DailyQuiz() {
 
   const inputRef = useRef(null);
 
-  // 퀴즈 단어 로딩 (오늘 단어 + 오답 5개)
+// DailyQuiz.js - loadQuiz 부분 수정
+
   const loadQuiz = (baseWords) => {
-    fetchWrongWords(5)
-      .then((wrongWords) => {
-        const solvedIds = JSON.parse(localStorage.getItem("solvedWrongIds") || "[]");
-        const filtered = wrongWords.filter(w => !solvedIds.includes(w.id)); // 맞힌 단어 제외
-        setQuizWords(shuffle([...baseWords, ...filtered]));
-      })
-      .catch(()          => setQuizWords(shuffle([...baseWords])))
-      .finally(()        => setLoading(false));
+
+  const fetchBase = baseWords.length > 0
+    ? Promise.resolve(baseWords)
+    : fetch(`/api/words/unit?unitId=${unitId}&limit=10&t=${Date.now()}`)
+        .then(r => r.json())
+        .then(d => Array.isArray(d) ? d : []);
+    fetchBase
+      .then(base =>
+        fetchWrongWords(5)
+          .then(wrongWords => setQuizWords(shuffle([...base, ...wrongWords])))
+          .catch(() => setQuizWords(shuffle([...base])))
+      )
+      .finally(() => setLoading(false));
+
   };
 
   useEffect(() => { loadQuiz(todayWords); }, []); // eslint-disable-line
@@ -235,7 +242,7 @@ export default function DailyQuiz() {
     setCurrent(0); setInput(''); setSubmitted(false);
     setIsCorrect(null); setResults([]); setShowResult(false);
     setLoading(true);
-    loadQuiz(todayWords);
+    loadQuiz(todayWords);  // todayWords 없으면 API에서 다시 fetch
   };
 
   if (loading) return <div style={S.center}>퀴즈를 준비하는 중...</div>;
