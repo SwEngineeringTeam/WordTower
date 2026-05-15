@@ -52,10 +52,11 @@ const UserMainPage = () => {
     fetchData();
   }, [navigate, userId]);
 
-  // 특정 유닛 클릭 시 퀴즈 화면으로 이동
+  // 수정 후
+
   const onUnitClick = (unitNum) => {
     if (unitNum <= unlockedUnits) {
-      navigate(`/quiz/${unitNum}`);
+      navigate(`/memory-card?unitId=${unitNum}`);
     }
   };
 
@@ -141,7 +142,7 @@ const UserMainPage = () => {
                 </div>
                 <button
                   className="primary-action"
-                  onClick={() => navigate("/memory-card", { state: { unitId: unlockedUnits } })}
+                  onClick={() => navigate(`/memory-card?unitId=${unlockedUnits}`)}
                 >
                   현재 유닛 학습 시작
                 </button>

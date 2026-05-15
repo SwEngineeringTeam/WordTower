@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Homepage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import UserMainPage from "./pages/UserMainPage";
-import QuizPage from "./pages/QuizPage";
+
 // 기존 관리자 컴포넌트
 import WordManager from './components/WordManager';
 import MemoryCard from './components/MemoryCard';
