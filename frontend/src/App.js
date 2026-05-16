@@ -10,6 +10,7 @@ import UserMainPage from "./pages/UserMainPage";
 import WordManager from './components/WordManager';
 import MemoryCard from './components/MemoryCard';
 import DailyQuiz from "./components/DailyQuiz";
+import WrongWordReviewPage from "./pages/WrongWordReviewPage"; // ← 추가
 
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
         {/* 4. 관리자 페이지 */}
         <Route path="/admin" element={<WordManager />} />
         <Route path="/memory-card" element={<MemoryCard />} />
+        <Route path="/wrong-word-review" element={<WrongWordReviewPage />} /> 
       </Routes>
     </Router>
   );

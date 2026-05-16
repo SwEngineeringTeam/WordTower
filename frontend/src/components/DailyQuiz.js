@@ -1,8 +1,10 @@
+// 수정 후
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { submitQuizAndUpdateStreak } from "../services/streakService";
 
 const themeColor = '#29B6F6';
+
 
 // ── API ──────────────────────────────────────────────────────────────────────
 
@@ -192,10 +194,15 @@ function ResultScreen({ results, quizWords, onRetry, onHome }) {
 
 // ── 메인 퀴즈 컴포넌트 ───────────────────────────────────────────────────────
 
+// 수정 후
 export default function DailyQuiz() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { unitId } = useParams();
+  const { unitId: paramUnitId } = useParams();
+
+  // ✅ useParams 또는 쿼리스트링 둘 다 지원
+  const queryUnitId = new URLSearchParams(location.search).get("unitId");
+  const unitId = paramUnitId || queryUnitId || "1";
 
   const userId = localStorage.getItem("userId") || "1";
   const todayWords = location.state?.words ?? [];
@@ -304,7 +311,25 @@ export default function DailyQuiz() {
     localStorage.setItem("streak", String(currentLocalStreak + 1));
 
     try {
-      const result = await submitQuizAndUpdateStreak(Number(userId), Number(unitId));
+      const total = quizWords.length;
+      const correct = results.filter(r => r.correct).length + (isCorrect ? 1 : 0);
+
+      // 단어별 정오답 details 생성 (마지막 문제 포함)
+      const details = [
+        ...results.map(r => ({
+          spelling: r.word,
+          userAnswer: r.userAnswer,
+          isCorrect: r.correct
+        })),
+        // 마지막 문제 (아직 results state에 안 들어간 상태라 따로 추가)
+        {
+          spelling: q.word,
+          userAnswer: input,
+          isCorrect: isCorrect
+        }
+      ];
+
+      const result = await submitQuizAndUpdateStreak(Number(userId), Number(unitId), total, correct, details);
       console.log("퀴즈 완료 → unit/streak 갱신 성공:", result);
     } catch (error) {
       console.error("백엔드 갱신 실패. 프론트에는 임시 반영됨:", error);

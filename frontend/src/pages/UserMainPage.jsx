@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUserStreak, getUserProgress } from "../services/streakService";
+import { getUnitProgress, markUnitAsDone } from "../services/unitProgressService";
+import UnitResultModal from "../components/UnitResultModal";
 import "../style/UserMainPage.css";
+
 
 const UserMainPage = () => {
   const navigate = useNavigate();
@@ -15,6 +18,9 @@ const UserMainPage = () => {
   ); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isStudyDone, setIsStudyDone] = useState(false); // ✅ 추가
+  const [isQuizDone, setIsQuizDone] = useState(false);   // ✅ 추가
+  const [resultModal, setResultModal] = useState(null); // ← 이 줄 추가
 
   // 드롭다운 열림/닫힘 상태 관리 (예: { 1: true, 2: false })
   const [expandedTiers, setExpandedTiers] = useState({});
@@ -40,6 +46,11 @@ const UserMainPage = () => {
         const finalProgress = Math.max(Number(progress) || 1, localProgress);
 
         setUnlockedUnits(finalProgress);
+
+        // ✅ 추가: 현재 유닛 완료 상태 조회
+        const unitProgress = await getUnitProgress(Number(userId), finalProgress);
+        setIsStudyDone(unitProgress.isStudyDone);
+        setIsQuizDone(unitProgress.isQuizDone);
         
       } catch (err) {
         console.error("데이터 조회 오류:", err);
@@ -55,7 +66,12 @@ const UserMainPage = () => {
   // 수정 후
 
   const onUnitClick = (unitNum) => {
-    if (unitNum <= unlockedUnits) {
+    if (unitNum > unlockedUnits) return;
+
+    if (unitNum < unlockedUnits) {
+      // Number()로 확실하게 숫자 변환
+      setResultModal({ unitId: Number(unitNum), unitName: `Unit ${unitNum}` });
+    } else {
       navigate(`/memory-card?unitId=${unitNum}`);
     }
   };
@@ -73,22 +89,27 @@ const UserMainPage = () => {
 
   // 특정 층(Tier)의 5개 유닛 버튼을 렌더링하는 함수
   const renderUnits = (tier, isCompletedTier = false) => {
-    const startUnit = (tier - 1) * 5 + 1; // 해당 층의 시작 유닛 번호
+    const startUnit = (tier - 1) * 5 + 1;
     const units = Array.from({ length: 5 }, (_, i) => startUnit + i);
 
     return (
       <div className="unit-row">
         {units.map((unitNum) => {
           const locked = unitNum > unlockedUnits;
+          // 현재 진행 유닛보다 작으면 완료된 유닛
+          const isCompleted = unitNum < unlockedUnits;
+
           return (
             <button
               key={`unit-${unitNum}`}
-              className={`unit-card ${locked ? "locked" : "unlocked"}`}
+              className={`unit-card ${locked ? "locked" : isCompleted ? "completed" : "unlocked"}`}
               onClick={() => onUnitClick(unitNum)}
               disabled={locked}
             >
               <span>Unit {unitNum}</span>
-              <strong>{locked ? "LOCKED" : isCompletedTier ? "DONE" : "PLAY"}</strong>
+              <strong>
+                {locked ? "LOCKED" : isCompleted ? "✅ DONE" : "PLAY"}
+              </strong>
               {locked && <span className="lock-icon">🔒</span>}
             </button>
           );
@@ -140,12 +161,61 @@ const UserMainPage = () => {
                   <p className="action-label">현재 진행 유닛</p>
                   <h3>Unit {unlockedUnits}</h3>
                 </div>
-                <button
-                  className="primary-action"
-                  onClick={() => navigate(`/memory-card?unitId=${unlockedUnits}`)}
-                >
-                  현재 유닛 학습 시작
-                </button>
+                <div className="action-buttons">
+                  {/* 단어 학습 버튼 */}
+                  <button
+                    className={`action-btn study-btn ${isStudyDone ? "done" : ""}`}
+                    onClick={async () => {
+                      try {
+                        const parsedUserId = Number(localStorage.getItem("userId"));
+                        if (!isNaN(parsedUserId) && parsedUserId > 0) {
+                          await markUnitAsDone(parsedUserId, unlockedUnits, "study");
+                          setIsStudyDone(true);
+                        }
+                      } catch (err) {
+                        console.error("학습 완료 저장 실패:", err);
+                      }
+                      navigate(`/memory-card?unitId=${unlockedUnits}`);
+                    }}
+                    title={isStudyDone ? "완료! 다시 학습할 수 있어요" : "단어 암기 학습 시작"}
+                  >
+                    <span className="btn-icon">{isStudyDone ? "✅" : "📖"}</span>
+                    <span className="btn-label">단어 학습</span>
+                    {isStudyDone && <span className="done-badge">완료</span>}
+                  </button>
+
+                  {/* 퀴즈 버튼 */}
+                  <button
+                    className={`action-btn quiz-btn ${isQuizDone ? "done" : ""}`}
+                    onClick={async () => {
+                      try {
+                        const parsedUserId = Number(localStorage.getItem("userId"));
+                        if (!isNaN(parsedUserId) && parsedUserId > 0) {
+                          await markUnitAsDone(parsedUserId, unlockedUnits, "quiz");
+                          setIsQuizDone(true);
+                        }
+                      } catch (err) {
+                        console.error("퀴즈 완료 저장 실패:", err);
+                      }
+                      navigate(`/quiz/${unlockedUnits}`);
+                    }}
+                    title={isQuizDone ? "완료! 다시 풀 수 있어요" : "퀴즈 풀기"}
+                  >
+                    <span className="btn-icon">{isQuizDone ? "✅" : "📝"}</span>
+                    <span className="btn-label">퀴즈</span>
+                    {isQuizDone && <span className="done-badge">완료</span>}
+                  </button>
+                  {/* 미니게임 버튼 - 항상 활성 */}
+                  <button
+                    className="action-btn mini-game-btn"
+                    onClick={() => navigate(`/mini-game?unitId=${unlockedUnits}`)}
+                    title="언제든지 즐길 수 있는 미니게임"
+                  >
+                    <span className="btn-icon">🎮</span>
+                    <span className="btn-label">미니게임</span>
+                    <span className="always-on-badge">Always ON</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -183,6 +253,14 @@ const UserMainPage = () => {
           </section>
         </main>
       </div>
+    {/* 완료된 유닛 클릭 시 결과 모달 */}
+      {resultModal && (
+        <UnitResultModal
+          unitId={resultModal.unitId}
+          unitName={resultModal.unitName}
+          onClose={() => setResultModal(null)}
+        />
+      )}
     </div>
   );
 };
