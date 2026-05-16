@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUserStreak, getUserProgress } from "../services/streakService";
-import { getUnitProgress, markUnitAsDone } from "../services/unitProgressService";
+import { getUnitProgress } from "../services/unitProgressService";
 import UnitResultModal from "../components/UnitResultModal";
 import "../style/UserMainPage.css";
 
@@ -165,21 +165,17 @@ const UserMainPage = () => {
                   {/* 단어 학습 버튼 */}
                   <button
                     className={`action-btn study-btn ${isStudyDone ? "done" : ""}`}
-                    onClick={async () => {
-                      try {
-                        const parsedUserId = Number(localStorage.getItem("userId"));
-                        if (!isNaN(parsedUserId) && parsedUserId > 0) {
-                          await markUnitAsDone(parsedUserId, unlockedUnits, "study");
-                          setIsStudyDone(true);
-                        }
-                      } catch (err) {
-                        console.error("학습 완료 저장 실패:", err);
-                      }
+                    onClick={() => {
+                      // ✅ markUnitAsDone 제거 - 단어 학습 완료는 MemoryCard에서 처리
                       navigate(`/memory-card?unitId=${unlockedUnits}`);
                     }}
                     title={isStudyDone ? "완료! 다시 학습할 수 있어요" : "단어 암기 학습 시작"}
                   >
-                    <span className="btn-icon">{isStudyDone ? "✅" : "📖"}</span>
+                    <span className="btn-icon">
+                    {isStudyDone
+                      ? <span style={{ fontSize: "18px", color: "#fff", fontWeight: "bold" }}>✔</span>
+                      : "📖"}
+                  </span>
                     <span className="btn-label">단어 학습</span>
                     {isStudyDone && <span className="done-badge">완료</span>}
                   </button>
@@ -187,21 +183,17 @@ const UserMainPage = () => {
                   {/* 퀴즈 버튼 */}
                   <button
                     className={`action-btn quiz-btn ${isQuizDone ? "done" : ""}`}
-                    onClick={async () => {
-                      try {
-                        const parsedUserId = Number(localStorage.getItem("userId"));
-                        if (!isNaN(parsedUserId) && parsedUserId > 0) {
-                          await markUnitAsDone(parsedUserId, unlockedUnits, "quiz");
-                          setIsQuizDone(true);
-                        }
-                      } catch (err) {
-                        console.error("퀴즈 완료 저장 실패:", err);
-                      }
+                    onClick={() => {
+                      // ✅ markUnitAsDone 제거 - 퀴즈 완료는 DailyQuiz에서 처리
                       navigate(`/quiz/${unlockedUnits}`);
                     }}
                     title={isQuizDone ? "완료! 다시 풀 수 있어요" : "퀴즈 풀기"}
                   >
-                    <span className="btn-icon">{isQuizDone ? "✅" : "📝"}</span>
+                    <span className="btn-icon">
+                    {isQuizDone
+                      ? <span style={{ fontSize: "18px", color: "#fff", fontWeight: "bold" }}>✔</span>
+                      : "📝"}
+                  </span>
                     <span className="btn-label">퀴즈</span>
                     {isQuizDone && <span className="done-badge">완료</span>}
                   </button>

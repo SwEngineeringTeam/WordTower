@@ -165,11 +165,27 @@ function CardScreen({ onHome }) {
     setFlipped(f => !f);
   };
 
-  const goNext = () => {
+  const goNext = async () => {
     if (current < words.length - 1) {
       setCurrent(c => c + 1);
       setFlipped(false);
     } else {
+      // ✅ 마지막 카드까지 봤을 때만 학습 완료 처리
+      try {
+        const parsedUserId = Number(localStorage.getItem("userId"));
+        if (!isNaN(parsedUserId) && parsedUserId > 0) {
+          await fetch(
+            `http://localhost:8080/api/progress/${parsedUserId}/unit/${unitId}/done`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ type: "study" })
+            }
+          );
+        }
+      } catch (err) {
+        console.error("학습 완료 저장 실패:", err);
+      }
       setShowResult(true);
     }
   };

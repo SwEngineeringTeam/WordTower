@@ -331,6 +331,19 @@ export default function DailyQuiz() {
 
       const result = await submitQuizAndUpdateStreak(Number(userId), Number(unitId), total, correct, details);
       console.log("퀴즈 완료 → unit/streak 갱신 성공:", result);
+
+      // ✅ 퀴즈 완료 시에만 완료 상태 저장
+      const parsedUserId = Number(userId);
+      if (!isNaN(parsedUserId) && parsedUserId > 0) {
+        await fetch(
+          `http://localhost:8080/api/progress/${parsedUserId}/unit/${unitId}/done`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: "quiz" })
+          }
+        );
+      }
     } catch (error) {
       console.error("백엔드 갱신 실패. 프론트에는 임시 반영됨:", error);
     }
