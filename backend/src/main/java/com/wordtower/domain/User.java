@@ -36,7 +36,7 @@ public class User {
     @Column(nullable = false, columnDefinition = "int default 1")
     private int unlockedUnits = 1; 
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)    
     private Role role = Role.USER;
 
     public enum Role { ADMIN, USER }
