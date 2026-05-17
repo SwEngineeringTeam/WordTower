@@ -13,6 +13,13 @@ export const login = async (email, password) => {
       localStorage.setItem("role", response.data.role); // 'ADMIN' 또는 'USER'
       localStorage.setItem("userId", response.data.userId);
       localStorage.setItem("nickname", response.data.nickname || "");
+      // store email locally so UI can perform conditional rendering for test accounts
+      if (response.data.email) {
+        localStorage.setItem("email", response.data.email);
+      } else {
+        // fallback: store the login email argument if backend does not return it
+        localStorage.setItem("email", email);
+      }
     }
 
     return response.data;

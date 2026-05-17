@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUserStreak, getUserProgress } from "../services/streakService";
+import { getStreakFreezeCount } from "../services/userService";
+import { getLastActivityDate } from "../services/userService"; 
 import "../style/UserMainPage.css";
+import Sidebar from "../components/Sidebar";
+import TopStatusBoard from "../components/TopStatusBoard";
 
 const UserMainPage = () => {
   const navigate = useNavigate();
@@ -9,14 +13,16 @@ const UserMainPage = () => {
   const nickname = localStorage.getItem("nickname") || "Tower Learner";
 
   const [streak, setStreak] = useState(0);
-  // 열려있는 가장 높은 유닛 번호 (테스트를 위해 로컬 스토리지 우선 사용, 추후 DB 연동 필요)
+  const [streakFreezeCount, setStreakFreezeCount] = useState(0);
   const [unlockedUnits, setUnlockedUnits] = useState(
     parseInt(localStorage.getItem("unlockedUnits")) || 1
   ); 
+  
+  // 1. 마지막 학습일(lastActivityDate)을 담을 상태 변수 추가
+  const [lastActivityDate, setLastActivityDate] = useState(null); 
+  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // 드롭다운 열림/닫힘 상태 관리 (예: { 1: true, 2: false })
   const [expandedTiers, setExpandedTiers] = useState({});
 
   useEffect(() => {
@@ -29,17 +35,24 @@ const UserMainPage = () => {
       try {
         setLoading(true);
         
-        // 1. 스트릭 가져오기
+        // 스트릭 가져오기
         const currentStreak = await getUserStreak(Number(userId));
         setStreak(currentStreak);
 
-        // 2. DB에서 유닛 진도 가져오기
+        // DB에서 유닛 진도 가져오기
         const progress = await getUserProgress(Number(userId));
-
         const localProgress = parseInt(localStorage.getItem("unlockedUnits")) || 1;
         const finalProgress = Math.max(Number(progress) || 1, localProgress);
-
         setUnlockedUnits(finalProgress);
+        
+        // 2. 마지막 학습일 가져오기 (API 호출 로직)
+        // 백엔드에 사용자 정보를 가져오는 API가 있다면 호출해서 날짜를 세팅합니다.
+        try {
+          const dateStr = await getLastActivityDate(Number(userId));
+          setLastActivityDate(dateStr);
+        } catch (e) {
+          console.warn("마지막 학습일 조회 실패", e);
+        }
         
       } catch (err) {
         console.error("데이터 조회 오류:", err);
@@ -47,19 +60,25 @@ const UserMainPage = () => {
       } finally {
         setLoading(false);
       }
+
+      try {
+        const freezeCount = await getStreakFreezeCount(Number(userId));
+        setStreakFreezeCount(freezeCount || 0);
+      } catch (err) {
+        console.warn("스트릭 방어권 조회 실패:", err);
+        setStreakFreezeCount(0);
+      }
     };
 
     fetchData();
   }, [navigate, userId]);
 
-  // 특정 유닛 클릭 시 퀴즈 화면으로 이동
   const onUnitClick = (unitNum) => {
     if (unitNum <= unlockedUnits) {
       navigate(`/quiz/${unitNum}`);
     }
   };
 
-  // 드롭다운 토글 함수
   const toggleTier = (tier) => {
     setExpandedTiers((prev) => ({
       ...prev,
@@ -67,12 +86,10 @@ const UserMainPage = () => {
     }));
   };
 
-  // 현재 층 계산 (1~5유닛 = 1층, 6~10유닛 = 2층...)
   const currentTier = Math.ceil(unlockedUnits / 5) || 1;
 
-  // 특정 층(Tier)의 5개 유닛 버튼을 렌더링하는 함수
   const renderUnits = (tier, isCompletedTier = false) => {
-    const startUnit = (tier - 1) * 5 + 1; // 해당 층의 시작 유닛 번호
+    const startUnit = (tier - 1) * 5 + 1;
     const units = Array.from({ length: 5 }, (_, i) => startUnit + i);
 
     return (
@@ -99,30 +116,17 @@ const UserMainPage = () => {
   return (
     <div className="user-main-page">
       <div className="dashboard-shell">
-        <aside className="sidebar">
-          <div className="sidebar-logo">Word Tower</div>
-          <button className="sidebar-button" onClick={() => navigate("/user")}>대시보드</button>
-          <button className="sidebar-button">설정</button>
-          <button className="sidebar-button">나의 단어장</button>
-          <button className="sidebar-button">복습하기</button>
-          <button className="sidebar-button">내 프로필</button>
-        </aside>
-
+        <Sidebar />
         <main className="main-panel">
-          <section className="top-status">
-            <div className="streak-card">
-              <div className="streak-icon">🔥</div>
-              <div>
-                <p className="status-label">연속 학습일</p>
-                <h2>{loading ? "..." : streak}</h2>
-              </div>
-            </div>
-
-            <div className="welcome-card">
-              <p>환영합니다, {nickname}님</p>
-              <h1>건설 중인 타워에서 오늘의 도전을 확인하세요</h1>
-            </div>
-          </section>
+          
+          {/* 3. TopStatusBoard 컴포넌트에 lastActivityDate 전달하기 */}
+          <TopStatusBoard
+            streak={streak}
+            streakFreezeCount={streakFreezeCount}
+            loading={loading}
+            nickname={nickname}
+            lastActivityDate={lastActivityDate} 
+          />
 
           <section className="tower-area">
             <div className="tower-skyline">
@@ -130,7 +134,6 @@ const UserMainPage = () => {
               <div className="blueprint-label">Tower Construction</div>
             </div>
 
-            {/* 현재 진행 중인 층 */}
             <div className="tower-board">
               <div className="tower-header">현재 층: Tier {currentTier}</div>
               {renderUnits(currentTier)}
@@ -148,12 +151,10 @@ const UserMainPage = () => {
               </div>
             </div>
 
-            {/* 완료된 이전 층 (드롭다운 영역) */}
             {currentTier > 1 && (
               <div className="done-panel">
                 <p>완료된 이전 층</p>
                 <div className="completed-tiers-list">
-                  {/* 역순으로 이전 층들을 배열 (예: 3층 진행중이면 2층, 1층 순서) */}
                   {Array.from({ length: currentTier - 1 }, (_, i) => currentTier - 1 - i).map((tier) => (
                     <div key={`tier-${tier}`} className="completed-tier-group">
                       <button 
@@ -162,8 +163,6 @@ const UserMainPage = () => {
                       >
                         Tier {tier} 완료 <span>{expandedTiers[tier] ? '▲' : '▼'}</span>
                       </button>
-                      
-                      {/* expandedTiers[tier]가 true일 때만 유닛 목록 표시 */}
                       {expandedTiers[tier] && (
                         <div className="tier-dropdown-content">
                           {renderUnits(tier, true)}

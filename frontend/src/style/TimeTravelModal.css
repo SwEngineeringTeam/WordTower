@@ -1,0 +1,97 @@
+/* 화면 전체를 어둡게 덮어주는 배경 (Backdrop) 역할 */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4); /* 반투명한 검은색 */
+  display: flex;
+  align-items: center; /* 세로 중앙 정렬 */
+  justify-content: center; /* 가로 중앙 정렬 */
+  z-index: 1000; /* 다른 화면 요소들보다 무조건 위에 오도록 설정 */
+}
+
+/* 화면 중앙에 나타나는 하얀색 팝업창 (Container) */
+.modal-container {
+  background: #ffffff;
+  border-radius: 10px; /* 테두리를 둥글게 처리 */
+  padding: 20px; /* 내부 여백 */
+  width: 320px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12); /* 팝업창에 입체감을 주는 그림자 효과 */
+}
+
+/* 방향 선택 라디오 버튼 그룹 */
+.modal-direction-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+/* 라디오 버튼 레이블 스타일 */
+.modal-radio {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+}
+
+.modal-radio input[type="radio"] {
+  margin-right: 8px;
+  cursor: pointer;
+  accent-color: #4CAF50; /* 라디오 버튼 체크 색상 */
+}
+
+/* 일수 입력 그룹 */
+.modal-days-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.modal-days-group label {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+/* 며칠 전/후로 이동할지 입력하는 숫자 입력창 (Input) */
+.modal-input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd; /* 옅은 회색 테두리 */
+  margin-bottom: 16px; /* 버튼과의 간격 확보 */
+  box-sizing: border-box; /* Padding이 너비에 포함되도록 설정 */
+  font-size: 14px;
+}
+
+.modal-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+/* 취소, 확인 버튼을 배치하는 영역 (Row) */
+.modal-button-row {
+  display: flex;
+  justify-content: flex-end; /* 버튼들을 오른쪽으로 밀어서 정렬 */
+  gap: 8px; /* 버튼 사이의 간격 */
+}
+
+/* 모달 내부의 기본 버튼 스타일 (선택 사항: 기존 프로젝트에 공통 버튼 디자인이 있다면 제외 가능) */
+.modal-button-row button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #f0f0f0;
+}
+
+/* 확인 버튼에만 특정 색상 강조 (선택 사항) */
+.modal-button-row button:last-child {
+  background-color: #007bff; /* 파란색 배경 */
+  color: white; /* 하얀색 글씨 */
+}
