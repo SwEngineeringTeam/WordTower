@@ -1,22 +1,20 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { login } from "../services/authService";
-import "../style/LoginPage.css";
+import { register } from "../services/authService";
+import "../style/LoginPage.css"; // 로그인 스타일 재활용
 
-const LoginPage = () => {
+const RegisterPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [nickname, setNickname] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const user_data = await login(email, password);
-      if (user_data.role === "ADMIN") {
-        navigate("/admin");
-      } else {
-        navigate("/user");
-      }
+      await register(email, password, nickname);
+      alert("회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.");
+      navigate("/login"); // 가입 성공 시 로그인 페이지로 이동
     } catch (err) {
       alert(err);
     }
@@ -27,10 +25,10 @@ const LoginPage = () => {
       <div className="login-card">
         <div className="login-header">
           <h2>Word Tower</h2>
-          <p>토익 정복을 위한 첫 걸음</p>
+          <p>새로운 계정을 만들어보세요</p>
         </div>
 
-        <form onSubmit={handleLogin} className="login-form">
+        <form onSubmit={handleRegister} className="login-form">
           <div className="input-group">
             <label>이메일 주소</label>
             <input
@@ -38,6 +36,17 @@ const LoginPage = () => {
               placeholder="example@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="input-group">
+            <label>닉네임</label>
+            <input
+              type="text"
+              placeholder="길동이"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
               required
             />
           </div>
@@ -53,17 +62,21 @@ const LoginPage = () => {
             />
           </div>
 
-          <button type="submit" className="login-button">
-            로그인하기
+          <button
+            type="submit"
+            className="login-button"
+            style={{ backgroundColor: "#10b981" }}
+          >
+            회원가입하기
           </button>
         </form>
 
         <div className="login-footer">
           <p>
-            계정이 없으신가요? {/* 이 버튼 부분을 아래와 같이 수정합니다 */}
+            이미 계정이 있으신가요?{" "}
             <button
               type="button"
-              onClick={() => navigate("/register")}
+              onClick={() => navigate("/login")}
               style={{
                 border: "none",
                 background: "none",
@@ -72,7 +85,7 @@ const LoginPage = () => {
                 textDecoration: "underline",
               }}
             >
-              회원가입
+              로그인
             </button>
           </p>
         </div>
@@ -81,4 +94,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;

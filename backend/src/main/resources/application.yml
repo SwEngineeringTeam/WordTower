@@ -5,7 +5,7 @@ spring:
     # MySQL 계정 아이디
     username: root
     # MySQL 계정 비밀번호
-    password: "1234"
+    password: "mysql"
 
     driver-class-name: com.mysql.cj.jdbc.Driver
 
@@ -24,6 +24,6 @@ spring:
   # [추가] 초기 데이터 파일 실행 설정
   sql:
     init:
-      # 서버를 켤 때마다 data.sql을 실행함 
+      # 서버를 켤 때마다 data.sql을 실행함
       # (데이터가 이미 있으면 에러가 날 수 있으므로 data.sql 안의 쿼리를 INSERT IGNORE로 쓰는 게 좋습니다)
       mode: always
