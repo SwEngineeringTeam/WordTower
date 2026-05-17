@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUserStreak, getUserProgress } from "../services/streakService";
-// 1. 새로 만든 프로필 컴포넌트 import
 import UserProfile from "./UserProfile"; 
 import "../style/UserMainPage.css";
 
 const UserMainPage = () => {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
-  const nickname = localStorage.getItem("nickname") || "Tower Learner";
   const userEmail = localStorage.getItem("userEmail") || "user@wordtower.com";
+
+  // 1. 닉네임 상태 관리
+  const [nickname, setNickname] = useState(
+    localStorage.getItem("nickname") || "Tower Learner"
+  );
 
   const [streak, setStreak] = useState(0);
   const [unlockedUnits, setUnlockedUnits] = useState(
@@ -46,6 +49,12 @@ const UserMainPage = () => {
 
     fetchData();
   }, [navigate, userId]);
+
+  // 닉네임 변경 핸들러
+  const handleNicknameChange = (newNickname) => {
+    localStorage.setItem("nickname", newNickname);
+    setNickname(newNickname);
+  };
 
   const onUnitClick = (unitNum) => {
     if (unitNum <= unlockedUnits) {
@@ -108,7 +117,6 @@ const UserMainPage = () => {
 
         <main className="main-panel">
           {activeTab === "dashboard" ? (
-            /* 대시보드 메인 타워 화면 */
             <>
               <section className="top-status">
                 <div className="streak-card">
@@ -169,13 +177,13 @@ const UserMainPage = () => {
               </section>
             </>
           ) : (
-            /* 2. 외부 파일로 분리한 프로필 컴포넌트 렌더링 (Props 전달) */
             <UserProfile 
               nickname={nickname}
               userEmail={userEmail}
               streak={streak}
               currentTier={currentTier}
               unlockedUnits={unlockedUnits}
+              onNicknameChange={handleNicknameChange}
             />
           )}
 

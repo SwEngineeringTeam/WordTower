@@ -1,11 +1,33 @@
 // src/pages/UserProfile.jsx
-import React from "react";
+import React, { useState } from "react";
 
-const UserProfile = ({ nickname, userEmail, streak, currentTier, unlockedUnits }) => {
+const UserProfile = ({ nickname, userEmail, streak, currentTier, unlockedUnits, onNicknameChange }) => {
+  // 수정 모드 상태 관리 (true일 때 입력창으로 변경)
+  const [isEditing, setIsEditing] = useState(false);
+  // 입력 중인 닉네임 상태 관리
+  const [editNickname, setEditNickname] = useState(nickname);
+
   // 유닛 진행도 백분율 계산
   const calculateProgressPercentage = () => {
     const currentTierUnitsCompleted = (unlockedUnits - 1) % 5;
     return (currentTierUnitsCompleted / 5) * 100;
+  };
+
+  // 저장 버튼 클릭 시 호출
+  const handleSave = () => {
+    if (!editNickname.trim()) {
+      alert("닉네임을 입력해 주세요.");
+      return;
+    }
+    // 상위 컴포넌트(UserMainPage)의 상태와 로컬 스토리지를 업데이트하는 함수 호출
+    onNicknameChange(editNickname);
+    setIsEditing(false);
+  };
+
+  // 취소 버튼 클릭 시 호출
+  const handleCancel = () => {
+    setEditNickname(nickname); // 기존 닉네임으로 원복
+    setIsEditing(false);
   };
 
   return (
@@ -13,7 +35,25 @@ const UserProfile = ({ nickname, userEmail, streak, currentTier, unlockedUnits }
       <div className="profile-header-card">
         <div className="profile-avatar">👤</div>
         <div className="profile-title">
-          <h2>{nickname}님의 프로필</h2>
+          {isEditing ? (
+            /* 수정 모드일 때 보일 입력창 UI */
+            <div className="nickname-edit-group">
+              <input
+                type="text"
+                className="nickname-input"
+                value={editNickname}
+                onChange={(e) => setEditNickname(e.target.value)}
+              />
+              <button className="edit-submit-btn" onClick={handleSave}>완료</button>
+              <button className="edit-cancel-btn" onClick={handleCancel}>취소</button>
+            </div>
+          ) : (
+            /* 일반 모드일 때 보일 닉네임 UI */
+            <div className="nickname-display-group">
+              <h2>{nickname}님의 프로필</h2>
+              <button className="edit-trigger-btn" onClick={() => setIsEditing(true)}>✏️ 수정</button>
+            </div>
+          )}
           <p className="profile-email">{userEmail}</p>
         </div>
       </div>
@@ -28,7 +68,7 @@ const UserProfile = ({ nickname, userEmail, streak, currentTier, unlockedUnits }
           </div>
         </div>
 
-        {/* 2. 경험치 (임시 0 처리) */}
+        {/* 2. 경험치 (EXP) */}
         <div className="profile-stat-card">
           <span className="stat-icon">✨</span>
           <div className="stat-info">

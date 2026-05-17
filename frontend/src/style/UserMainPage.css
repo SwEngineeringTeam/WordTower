@@ -397,3 +397,96 @@
   font-weight: bold;
   color: #1e293b;
 }
+
+/* 닉네임 표시 및 수정 그룹 */
+.nickname-display-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.nickname-display-group h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #1e293b;
+  font-weight: 700;
+}
+
+/* ✏️ 수정 버튼 스타일 고도화 */
+.edit-trigger-btn {
+  background-color: transparent;
+  border: 1px solid #cbd5e1;
+  padding: 6px 12px;
+  border-radius: 20px; /* 라운딩을 주어 더 트렌디하게 변경 */
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.edit-trigger-btn:hover {
+  background-color: #f8fafc;
+  border-color: #94a3b8;
+  color: #334155;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* 닉네임 입력 수정 중 UI */
+.nickname-edit-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nickname-input {
+  font-size: 18px;
+  padding: 6px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  font-weight: bold;
+  color: #1e293b;
+  background-color: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+.nickname-input:focus {
+  border-color: #3b82f6;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* 완료 및 취소 버튼 */
+.edit-submit-btn, .edit-cancel-btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-submit-btn {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+}
+
+.edit-submit-btn:hover {
+  background-color: #2563eb;
+}
+
+.edit-cancel-btn {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.edit-cancel-btn:hover {
+  background-color: #e2e8f0;
+  color: #1e293b;
+}
