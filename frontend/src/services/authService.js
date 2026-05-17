@@ -23,7 +23,8 @@ export const login = async (email, password) => {
   }
 };
 
-export const register = async (email, password, nickname) => {
+// 💡 [PBI-17 수정] 매개변수 맨 뒤에 toeicScore를 받아오도록 추가했습니다!
+export const register = async (email, password, nickname, toeicScore) => {
   try {
     // 로그인과 마찬가지로 설정파일(API)을 사용하여 엔드포인트만 적어줍니다.
     // 자동으로 http://localhost:8080/api/register 로 요청이 날아갑니다.
@@ -31,6 +32,7 @@ export const register = async (email, password, nickname) => {
       email,
       password,
       nickname,
+      toeicScore, // 이제 화면에서 입력받은 값이 정상적으로 담겨 날아갑니다.
     });
 
     return response.data;

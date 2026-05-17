@@ -9,11 +9,20 @@ const RegisterPage = () => {
   const [nickname, setNickname] = useState("");
   const navigate = useNavigate();
 
+  // 💡 [PBI-17] 토익 점수 상태 관리
+  const [toeicScore, setToeicScore] = useState("");
+  const [dontKnowScore, setDontKnowScore] = useState(false);
+
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      await register(email, password, nickname);
-      alert("회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.");
+      // 💡 "모르겠어요"를 체크했으면 null(또는 0), 입력했으면 숫자로 변환
+      const finalScore = dontKnowScore ? null : Number(toeicScore);
+
+      // 💡 백엔드로 점수(finalScore)까지 함께 전송합니다.
+      await register(email, password, nickname, finalScore);
+
+      alert("회원가입 및 온보딩이 완료되었습니다! 로그인 페이지로 이동합니다.");
       navigate("/login"); // 가입 성공 시 로그인 페이지로 이동
     } catch (err) {
       alert(err);
@@ -33,7 +42,6 @@ const RegisterPage = () => {
             <label>이메일 주소</label>
             <input
               type="email"
-              placeholder="example@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -44,7 +52,6 @@ const RegisterPage = () => {
             <label>닉네임</label>
             <input
               type="text"
-              placeholder="길동이"
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               required
@@ -55,11 +62,58 @@ const RegisterPage = () => {
             <label>비밀번호</label>
             <input
               type="password"
-              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+          </div>
+
+          {/* 💡 [PBI-17 추가] 토익 점수 입력 섹션 */}
+          <div className="input-group" style={{ marginTop: "15px" }}>
+            <label style={{ fontWeight: "bold" }}>기존 토익 점수</label>
+            <input
+              type="number"
+              placeholder="예: 700 (미입력 시 0층 시작)"
+              value={toeicScore}
+              onChange={(e) => setToeicScore(e.target.value)}
+              disabled={dontKnowScore} // "모르겠어요" 체크 시 입력창 비활성화
+              min="0"
+              max="990"
+              required={!dontKnowScore} // 체크 안 했을 때만 필수 입력하게 만듦
+            />
+          </div>
+
+          {/* 💡 [PBI-17 추가] "모르겠어요" 체크박스 */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              marginBottom: "20px",
+              width: "100%",
+            }}
+          >
+            <input
+              type="checkbox"
+              id="dontKnow"
+              checked={dontKnowScore}
+              onChange={(e) => {
+                setDontKnowScore(e.target.checked);
+                if (e.target.checked) {
+                  setToeicScore(""); // 체크하면 적어두었던 점수 칸 비우기
+                }
+              }}
+            />
+            <label
+              htmlFor="dontKnow"
+              style={{
+                fontSize: "0.9rem",
+                cursor: "pointer",
+                color: "#4b5563",
+              }}
+            >
+              토익 점수를 모르겠어요. (0층부터 시작)
+            </label>
           </div>
 
           <button

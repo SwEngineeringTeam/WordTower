@@ -24,6 +24,10 @@ public class User {
 
     private int difficulty = 1;
 
+    // 💡 [필수 추가] 변수(필드)가 먼저 선언되어 있어야 에러가 안 납니다!
+    @Column(nullable = false, columnDefinition = "int default 0")
+    private int exp = 0; 
+
     private int currentStreak = 0;
     private int longestStreak = 0;
     private LocalDateTime lastActivityDate;
@@ -36,4 +40,9 @@ public class User {
     private Role role = Role.USER;
 
     public enum Role { ADMIN, USER }
+
+    // 변수가 선언되었기 때문에 이제 이 setter 메서드도 정상 작동합니다.
+    public void setExp(int exp) {
+        this.exp = exp;
+    }
 }
