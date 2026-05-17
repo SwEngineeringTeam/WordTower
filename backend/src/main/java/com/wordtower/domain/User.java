@@ -45,4 +45,14 @@ public class User {
     public void setExp(int exp) {
         this.exp = exp;
     }
+
+    public void addQuizExp(int correctCount) {
+    int earnedExp = correctCount * 5; // 1문제당 5점
+    
+    if (earnedExp > 75) {
+        earnedExp = 75; // 유닛당 최대 75점 제한 규칙
+    }
+    
+    this.exp += earnedExp; // 기존 경험치에 더하기
+}
 }
