@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional; // ✅ 추가
 
 @Repository
 public interface WordRepository extends JpaRepository<Word, Long> {
@@ -36,4 +37,8 @@ public interface WordRepository extends JpaRepository<Word, Long> {
             @Param("endId") int endId,
             @Param("limit") int limit
     );
+    
+    // ✅ 추가: spelling으로 단어 뜻 조회 (UnitResultService에서 사용)
+    Optional<Word> findByWord(String word);
+
 }

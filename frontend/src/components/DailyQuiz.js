@@ -221,22 +221,54 @@ export default function DailyQuiz() {
 
 // DailyQuiz.js - loadQuiz 부분 수정
 
-  const loadQuiz = (baseWords) => {
+  // 수정 후
+const loadQuiz = (baseWords) => {
 
   const fetchBase = baseWords.length > 0
     ? Promise.resolve(baseWords)
     : fetch(`/api/words/unit?unitId=${unitId}&limit=10&t=${Date.now()}`)
         .then(r => r.json())
         .then(d => Array.isArray(d) ? d : []);
-    fetchBase
-      .then(base =>
-        fetchWrongWords(5)
-          .then(wrongWords => setQuizWords(shuffle([...base, ...wrongWords])))
-          .catch(() => setQuizWords(shuffle([...base])))
-      )
-      .finally(() => setLoading(false));
 
-  };
+  fetchBase
+    .then(base => {
+      const baseIds = new Set(base.map(w => w.id));
+
+      return fetchWrongWords(5)
+        .then(wrongWords => {
+          // 중복 제거 (base에 이미 있는 단어는 제외)
+          const filtered = wrongWords.filter(w => !baseIds.has(w.id));
+          const needed = 5 - filtered.length;
+
+          if (needed <= 0) {
+            // ✅ 오답 5개 충분한 경우
+            return setQuizWords(shuffle([...base, ...filtered.slice(0, 5)]));
+          }
+
+          return fetch(`/api/words/daily?unitId=${unitId}&limit=${needed * 3}&t=${Date.now()}`)
+            .then(r => r.json())
+            .then(d => Array.isArray(d) ? d : [])
+            .then(extra => {
+              // base랑 이미 뽑은 오답과 중복 제거
+              const allIds = new Set([...baseIds, ...filtered.map(w => w.id)]);
+              const extraFiltered = extra.filter(w => !allIds.has(w.id)).slice(0, needed);
+              return setQuizWords(shuffle([...base, ...filtered, ...extraFiltered]));
+            });
+        })
+        .catch(() => {
+          // fetchWrongWords 자체가 실패한 경우 랜덤으로 채우기
+          return fetch(`/api/words/daily?unitId=${unitId}&limit=15&t=${Date.now()}`)
+            .then(r => r.json())
+            .then(d => Array.isArray(d) ? d : [])
+            .then(extra => {
+              const extraFiltered = extra.filter(w => !baseIds.has(w.id)).slice(0, 5);
+              return setQuizWords(shuffle([...base, ...extraFiltered]));
+            });
+        });
+    })
+    .finally(() => setLoading(false));
+
+};
 
   useEffect(() => { loadQuiz(todayWords); }, []); // eslint-disable-line
 
@@ -310,24 +342,28 @@ export default function DailyQuiz() {
     const currentLocalStreak = Number(localStorage.getItem("streak")) || 0;
     localStorage.setItem("streak", String(currentLocalStreak + 1));
 
+    // ✅ 추가: UnitResultModal에서 사용할 퀴즈 결과 저장
+    const total = quizWords.length;
+    const correct = results.filter(r => r.correct).length;
+    const wrongWordList = results
+      .filter(r => !r.correct)
+      .map(r => ({ english: r.word, korean: r.meaning }));
+    localStorage.setItem(`quizResult_unit_${unitId}`, JSON.stringify({ total, correct }));
+    localStorage.setItem(`wrongWords_unit_${unitId}`, JSON.stringify(wrongWordList));
+    
     try {
       const total = quizWords.length;
-      const correct = results.filter(r => r.correct).length + (isCorrect ? 1 : 0);
+      // ✅ 수정: results에 이미 마지막 문제까지 포함되어 있으므로 isCorrect 따로 더하지 않음
+      const correct = results.filter(r => r.correct).length;
 
-      // 단어별 정오답 details 생성 (마지막 문제 포함)
-      const details = [
-        ...results.map(r => ({
-          spelling: r.word,
-          userAnswer: r.userAnswer,
-          isCorrect: r.correct
-        })),
-        // 마지막 문제 (아직 results state에 안 들어간 상태라 따로 추가)
-        {
-          spelling: q.word,
-          userAnswer: input,
-          isCorrect: isCorrect
-        }
-      ];
+      // ✅ 수정: details도 results에서만 생성 — 마지막 문제 수동 추가 블록 삭제
+      const details = results.map(r => ({
+        spelling: r.word,
+        userAnswer: r.userAnswer,
+        isCorrect: r.correct,
+        meaning: r.meaning  // ✅ 추가
+      }));
+      
 
       const result = await submitQuizAndUpdateStreak(Number(userId), Number(unitId), total, correct, details);
       console.log("퀴즈 완료 → unit/streak 갱신 성공:", result);

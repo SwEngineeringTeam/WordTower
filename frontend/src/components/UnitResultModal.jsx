@@ -12,24 +12,31 @@ import "../style/UnitResultModal.css";
  * @param {string}   unitName - 유닛 표시명 (ex. "Unit 3")
  * @param {Function} onClose  - 모달 닫기 콜백
  */
-const UnitResultModal = ({ unitId, unitName, onClose }) => {
+  const UnitResultModal = ({ unitId, unitName, onClose }) => {
   const navigate = useNavigate();
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 컴포넌트 마운트 시 해당 유닛의 결과 데이터 불러오기
+  // 수정 후
   useEffect(() => {
-    const fetchResult = async () => {
-      try {
-        const data = await getUnitResult(unitId);
-        setResult(data);
-      } catch (error) {
-        console.error("유닛 결과 조회 실패:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchResult();
+    const savedResult = localStorage.getItem(`quizResult_unit_${unitId}`);
+    const savedWrong  = localStorage.getItem(`wrongWords_unit_${unitId}`);
+
+    if (savedResult) {
+      const { total, correct } = JSON.parse(savedResult);
+      const wrongWords = savedWrong ? JSON.parse(savedWrong) : [];
+      const accuracy = total > 0
+        ? Math.round((correct * 100.0 / total) * 10) / 10.0
+        : 0.0;
+
+      setResult({
+        quizAccuracy: accuracy,
+        totalQuestions: total,
+        correctCount: correct,
+        wrongWords: wrongWords
+      });
+    }
+    setLoading(false);
   }, [unitId]);
 
   // 정답률에 따른 색상 결정
@@ -68,7 +75,7 @@ const UnitResultModal = ({ unitId, unitName, onClose }) => {
             {/* 틀린 단어 수 요약 */}
             {result?.wrongWords?.length > 0 && (
               <p className="wrong-word-summary">
-                ⚠️ 틀린 단어 <strong>{result.wrongWords.length}개</strong>가 있어요. 복습해보세요!
+                ⚠️ 틀린 단어가 있어요. 복습해보세요!
               </p>
             )}
 

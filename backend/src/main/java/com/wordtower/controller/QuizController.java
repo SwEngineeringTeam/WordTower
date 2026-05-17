@@ -45,6 +45,7 @@ public class QuizController {
             private String spelling;   // 영어 단어
             private String userAnswer; // 유저가 입력한 답
             private boolean isCorrect; // 정오답 여부
+            private String meaning; // ✅ 추가
         }
     }
 
@@ -89,6 +90,7 @@ public class QuizController {
                 quizDetail.setSpelling(detail.getSpelling());
                 quizDetail.setUserAnswer(detail.getUserAnswer());
                 quizDetail.setCorrect(detail.isCorrect());
+                quizDetail.setMeaning(detail.getMeaning());
                 quizDetailRepository.save(quizDetail);
             }
         }

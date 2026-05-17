@@ -19,13 +19,15 @@ public interface QuizResultRepository extends JpaRepository<QuizRecord, Long> {
      * 특정 유저의 가장 최근 QuizRecord 1건 조회
      * ※ QuizRecord에 unitId 컬럼 확인 후 WHERE 조건 추가 예정
      */
+    // 수정 후
     @Query("""
-        SELECT qr FROM QuizRecord qr
-        WHERE qr.user.id = :userId AND qr.unitId = :unitId
-        ORDER BY qr.testDate DESC
+                SELECT qr FROM QuizRecord qr
+                WHERE qr.user.id = :userId AND qr.unitId = :unitId
+                ORDER BY qr.testDate DESC
+                LIMIT 1
     """)
     Optional<QuizRecord> findLatestByUserIdAndUnitId(@Param("userId") Long userId,
-                                                      @Param("unitId") int unitId);
+            @Param("unitId") int unitId);
 
     /**
      * 특정 QuizRecord에 속한 틀린 단어 목록 조회
