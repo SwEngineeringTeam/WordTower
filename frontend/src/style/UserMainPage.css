@@ -251,10 +251,6 @@
   color: #475569;
 }
 
-.primary-action {
-  padding: 16px 28px;
-  border-radius: 999px; /* 완전한 둥근 모서리(Pill 형태) */
-/* ===== 3버튼 액션 영역 ===== */
 .action-buttons {
   display: flex;
   gap: 12px;
