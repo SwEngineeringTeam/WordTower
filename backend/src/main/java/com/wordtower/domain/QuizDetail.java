@@ -18,4 +18,5 @@ public class QuizDetail {
     private String spelling;
     private String userAnswer;
     private boolean isCorrect;
+    private String meaning; // ✅ 추가
 }

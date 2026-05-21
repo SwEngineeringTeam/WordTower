@@ -35,10 +35,22 @@ export const getUserProgress = async (userId) => {
  * @param {number} userId - 사용자 ID
  * @param {number} completedUnit - 방금 완료한 유닛 번호 (기존 solvedCount 대신 사용)
  */
-export const submitQuizAndUpdateStreak = async (userId, completedUnit) => {
+/**
+ * 퀴즈 제출, 스트릭 갱신 및 다음 유닛 오픈을 통합 요청
+ * @param {number} userId - 사용자 ID
+ * @param {number} completedUnit - 방금 완료한 유닛 번호
+ * @param {number} totalCount - 총 문제 수
+ * @param {number} correctCount - 정답 수
+ */
+export const submitQuizAndUpdateStreak = async (userId, completedUnit, totalCount = 0, correctCount = 0, details = []) => {
   try {
-    // 쿼리 파라미터 방식으로 userId와 completedUnit을 함께 보냄
-    const response = await API.post(`/api/quiz/submit?userId=${userId}&completedUnit=${completedUnit}`);
+    const response = await API.post(`/api/quiz/submit`, {
+      userId,
+      completedUnit,
+      totalCount,
+      correctCount,
+      details  // ← 단어별 정오답 목록 추가
+    });
     return response.data;
   } catch (error) {
     console.error("Error updating streak and progress after quiz:", error);

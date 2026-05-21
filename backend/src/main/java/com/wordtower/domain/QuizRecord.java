@@ -15,10 +15,12 @@ public class QuizRecord {
     @JoinColumn(name = "user_id")
     private User user;
 
+    private int unitId;  // ← 추가
+
     private int totalCount;
     private int correctCount;
     private double score;
-    private double predictedScore; // AI 예측 점수용
+    private double predictedScore;
     
     private LocalDateTime testDate = LocalDateTime.now();
 }

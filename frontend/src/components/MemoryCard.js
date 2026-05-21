@@ -3,24 +3,20 @@ import { useNavigate,useLocation } from 'react-router-dom';
 
 const themeColor = '#29B6F6';
 
-const fetchWords = async (difficulty = 1) => {
+const fetchWords = async (unitId = 1) => {
   const response = await fetch(
-   `/api/words/daily?difficulty=${difficulty}&limit=10&t=${new Date().getTime()}`
-);
 
-  if (!response.ok) {
-    throw new Error('단어를 불러오지 못했습니다.');
-  }
-
+    `/api/words/unit?unitId=${unitId}&limit=10&t=${new Date().getTime()}`
+  );
+  if (!response.ok) throw new Error('단어를 불러오지 못했습니다.');
   const data = await response.json();
-  console.log('받아온 단어 데이터:', data);
-
   return Array.isArray(data) ? data : [];
 };
 
 const DifficultyStars = ({ difficulty }) => {
   const parsed = Number(difficulty);
-  const level = Number.isFinite(parsed) ? parsed : 1;
+  const level = Number.isFinite(parsed) ? parsed +1 : 1;
+
   return (
     <div style={{ display: 'flex', gap: '3px' }}>
       {[1, 2, 3, 4, 5].map(i => (
@@ -99,7 +95,8 @@ function ResultScreen({ words, onRestart, onHome, onQuiz }) {   // ← onQuiz �
 function CardScreen({ onHome }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const unitId = location.state?.unitId || 1;
+  const params = new URLSearchParams(location.search);
+  const unitId = params.get('unitId') || location.state?.unitId || 1;
   const [words, setWords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -107,11 +104,12 @@ function CardScreen({ onHome }) {
   const [flipped, setFlipped] = useState(false);
   const [showResult, setShowResult] = useState(false);
 
+  // useEffect도 수정
   useEffect(() => {
-    fetchWords()
+    fetchWords(unitId)  // unitId 넘기기
       .then(data => { setWords(data); setLoading(false); })
       .catch(err => { setError(err.message); setLoading(false); });
-  }, []);
+  }, [unitId]);
 
   const handleRestart = () => {
     setLoading(true);
@@ -119,7 +117,7 @@ function CardScreen({ onHome }) {
     setCurrent(0);
     setFlipped(false);
     setShowResult(false);
-    fetchWords()
+    fetchWords(unitId)   // ← unitId 전달
       .then(data => { setWords(data); setLoading(false); })
       .catch(err => { setError(err.message); setLoading(false); });
   };
@@ -167,11 +165,27 @@ function CardScreen({ onHome }) {
     setFlipped(f => !f);
   };
 
-  const goNext = () => {
+  const goNext = async () => {
     if (current < words.length - 1) {
       setCurrent(c => c + 1);
       setFlipped(false);
     } else {
+      // ✅ 마지막 카드까지 봤을 때만 학습 완료 처리
+      try {
+        const parsedUserId = Number(localStorage.getItem("userId"));
+        if (!isNaN(parsedUserId) && parsedUserId > 0) {
+          await fetch(
+            `http://localhost:8080/api/progress/${parsedUserId}/unit/${unitId}/done`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ type: "study" })
+            }
+          );
+        }
+      } catch (err) {
+        console.error("학습 완료 저장 실패:", err);
+      }
       setShowResult(true);
     }
   };
