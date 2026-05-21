@@ -189,13 +189,101 @@
   color: #475569;
 }
 
-.primary-action {
-  padding: 16px 28px;
-  border-radius: 999px;
+/* ===== 3버튼 액션 영역 ===== */
+.action-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.action-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 18px 24px;
   border: none;
-  background: #2563eb;
-  color: white;
+  border-radius: 16px;
+  /* 사진처럼 완전 둥글게 */
   cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  min-width: 110px;
+}
+
+.action-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+}
+
+.action-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.btn-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+/* 사진처럼 하늘색 계열 */
+.study-btn {
+  background:#79c7f1;
+}
+
+.quiz-btn {
+  background: #26C6DA;
+}
+
+.mini-game-btn {
+  background:  #1976D2;
+}
+
+/* 완료 상태 - 초록색으로 바꿔서 티나게 */
+.action-btn.done {
+  background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
+}
+
+.action-btn.done:hover {
+  background: linear-gradient(135deg, #16a34a, #15803d) !important;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(34, 197, 94, 0.45);
+}
+
+.action-btn.done .btn-label {
+  color: #ffffff;
+}
+
+/* 배지 */
+.done-badge,
+.always-on-badge {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 20px;
+}
+
+.done-badge {
+  background: rgba(0, 0, 0, 0.2);
+  color: #eceff1;
+}
+
+.always-on-badge {
+  background: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
 }
 
 .done-panel {

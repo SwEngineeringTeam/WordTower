@@ -7,24 +7,38 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional; // ✅ 추가
 
-/**
- * WordRepository: MySQL DB와 통신하여 CRUD를 수행합니다.
- */
 @Repository
 public interface WordRepository extends JpaRepository<Word, Long> {
 
-    // 랜덤으로 n개 단어 조회
-    @Query(value = "SELECT * FROM word ORDER BY RAND() LIMIT :limit", nativeQuery = true)
-    List<Word> findRandomWords(@Param("limit") int limit);
 
-    // 특정 난이도(difficulty)의 단어 중에서 랜덤으로 n개 조회
+    @Query(value = "SELECT * FROM word WHERE difficulty = :difficulty ORDER BY id ASC LIMIT :limit OFFSET :offset", nativeQuery = true)
+    List<Word> findWordsByDifficultyOrdered(
+            @Param("difficulty") String difficulty,
+            @Param("limit") int limit,
+            @Param("offset") int offset
+    );
+
+
     @Query(value = "SELECT * FROM word WHERE difficulty = :difficulty ORDER BY RAND() LIMIT :limit", nativeQuery = true)
     List<Word> findRandomWordsByDifficulty(
             @Param("difficulty") String difficulty,
             @Param("limit") int limit
     );
-    // 오답 단어가 아직 없을 때 임시로 랜덤 단어 n개 조회
+
     @Query(value = "SELECT * FROM word ORDER BY RAND() LIMIT :limit", nativeQuery = true)
     List<Word> findWrongWordsTemp(@Param("limit") int limit);
+
+    // 이것만 하나만 있어야 함!
+    @Query(value = "SELECT * FROM word WHERE id BETWEEN :startId AND :endId ORDER BY id ASC LIMIT :limit", nativeQuery = true)
+    List<Word> findWordsByUnitId(
+            @Param("startId") int startId,
+            @Param("endId") int endId,
+            @Param("limit") int limit
+    );
+    
+    // ✅ 추가: spelling으로 단어 뜻 조회 (UnitResultService에서 사용)
+    Optional<Word> findByWord(String word);
+
 }

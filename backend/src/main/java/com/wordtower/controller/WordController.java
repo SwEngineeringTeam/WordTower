@@ -26,10 +26,10 @@ public class WordController {
     }
     @GetMapping("/daily")
     public List<Word> getDailyWords(
-            @RequestParam(defaultValue = "1") String difficulty,
+            @RequestParam(defaultValue = "1") String unitId,
             @RequestParam(defaultValue = "10") int limit
     ) {
-        return wordService.findRandomByDifficulty(difficulty, limit);
+        return wordService.findRandomByDifficulty(unitId, limit);
     }
     @GetMapping("/wrong")
     public List<Word> getWrongWords(
@@ -45,6 +45,13 @@ public class WordController {
     @PostMapping
     public Word createWord(@RequestBody Word word) {
         return wordService.save(word);
+    }
+    @GetMapping("/unit")
+    public List<Word> getWordsByUnit(
+        @RequestParam(defaultValue = "1") int unitId,
+        @RequestParam(defaultValue = "10") int limit
+    ) {
+        return wordService.findWordsByUnit(unitId, limit);
     }
 
     @PutMapping("/{id}")
@@ -62,4 +69,11 @@ public class WordController {
         wordService.delete(id);
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/wrong/{wordId}")
+    public ResponseEntity<Void> deleteWrongWord(@PathVariable Long wordId) {
+        wordService.deleteWrongWord(wordId);
+        return ResponseEntity.ok().build();
+    }
+
 }
