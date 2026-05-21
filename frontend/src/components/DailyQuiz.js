@@ -171,8 +171,6 @@ function ResultScreen({ results, quizWords, onRetry, onHome }) {
           </div>
         ))}
       </div>
-
-      {/* 버튼 */}
       <div style={{ display: 'flex', gap: '10px', width: '100%', maxWidth: '560px', paddingBottom: '2rem' }}>
         <button
             onClick={onHome}
@@ -180,14 +178,7 @@ function ResultScreen({ results, quizWords, onRetry, onHome }) {
         >
             홈으로
         </button>
-
-        <button
-            onClick={onRetry}
-            style={{ ...S.btnPrimary, flex: 3 }}
-        >
-            다시 풀기
-        </button>
-    </div>
+      </div>
     </div>
   );
 }
