@@ -1,7 +1,14 @@
 // src/pages/UserProfile.jsx
 import React, { useState } from "react";
 
-const UserProfile = ({ nickname, userEmail, streak, currentTier, unlockedUnits, onNicknameChange }) => {
+const UserProfile = ({
+  nickname,
+  userEmail,
+  streak,
+  currentTier,
+  unlockedUnits,
+  onNicknameChange,
+}) => {
   // 수정 모드 상태 관리 (true일 때 입력창으로 변경)
   const [isEditing, setIsEditing] = useState(false);
   // 입력 중인 닉네임 상태 관리
@@ -29,6 +36,10 @@ const UserProfile = ({ nickname, userEmail, streak, currentTier, unlockedUnits, 
     setEditNickname(nickname); // 기존 닉네임으로 원복
     setIsEditing(false);
   };
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.href = "/login";
+  };
 
   return (
     <section className="profile-section">
@@ -44,14 +55,43 @@ const UserProfile = ({ nickname, userEmail, streak, currentTier, unlockedUnits, 
                 value={editNickname}
                 onChange={(e) => setEditNickname(e.target.value)}
               />
-              <button className="edit-submit-btn" onClick={handleSave}>완료</button>
-              <button className="edit-cancel-btn" onClick={handleCancel}>취소</button>
+              <button className="edit-submit-btn" onClick={handleSave}>
+                완료
+              </button>
+              <button className="edit-cancel-btn" onClick={handleCancel}>
+                취소
+              </button>
             </div>
           ) : (
             /* 일반 모드일 때 보일 닉네임 UI */
             <div className="nickname-display-group">
               <h2>{nickname}님의 프로필</h2>
-              <button className="edit-trigger-btn" onClick={() => setIsEditing(true)}>✏️ 수정</button>
+              <button
+                className="edit-trigger-btn"
+                onClick={() => setIsEditing(true)}
+              >
+                ✏️ 수정
+              </button>
+              <button
+                onClick={handleLogout} // 부모 컴포넌트나 전역에서 가져온 로그아웃 함수
+                className="logout-btn"
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "#fee2e2", // 연한 빨간색
+                  color: "#dc2626", // 진한 빨간색 텍스트
+                  border: "none",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                  transition: "background 0.2s",
+                }}
+                onMouseOver={(e) =>
+                  (e.target.style.backgroundColor = "#fecaca")
+                }
+                onMouseOut={(e) => (e.target.style.backgroundColor = "#fee2e2")}
+              >
+                로그아웃
+              </button>
             </div>
           )}
           <p className="profile-email">{userEmail}</p>
@@ -82,23 +122,27 @@ const UserProfile = ({ nickname, userEmail, streak, currentTier, unlockedUnits, 
           <span className="stat-icon">🏢</span>
           <div className="stat-info">
             <p className="stat-label">현재 유닛 위치</p>
-            <h3 className="stat-value">Tier {currentTier} - Unit {unlockedUnits}</h3>
+            <h3 className="stat-value">
+              Tier {currentTier} - Unit {unlockedUnits}
+            </h3>
           </div>
         </div>
 
         {/* 4. 유닛 진행도 */}
         <div className="profile-stat-card progress-card-full">
           <span className="stat-icon">📊</span>
-          <div className="stat-info" style={{ width: '100%' }}>
+          <div className="stat-info" style={{ width: "100%" }}>
             <p className="stat-label">현재 층(Tier) 진행도</p>
             <div className="progress-bar-container">
-              <div 
-                className="progress-bar-fill" 
+              <div
+                className="progress-bar-fill"
                 style={{ width: `${calculateProgressPercentage()}%` }}
               ></div>
             </div>
             <p className="progress-text">
-              Tier {currentTier}의 5개 유닛 중 <strong>{(unlockedUnits - 1) % 5}개</strong> 완료 ({calculateProgressPercentage().toFixed(0)}%)
+              Tier {currentTier}의 5개 유닛 중{" "}
+              <strong>{(unlockedUnits - 1) % 5}개</strong> 완료 (
+              {calculateProgressPercentage().toFixed(0)}%)
             </p>
           </div>
         </div>

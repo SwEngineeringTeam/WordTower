@@ -119,7 +119,7 @@ const RegisterPage = () => {
           <button
             type="submit"
             className="login-button"
-            style={{ backgroundColor: "#10b981" }}
+            style={{ backgroundColor: "#2563eb" }}
           >
             회원가입하기
           </button>
