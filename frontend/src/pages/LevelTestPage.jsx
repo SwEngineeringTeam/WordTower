@@ -110,6 +110,11 @@ const LevelTestPage = () => {
         <section style={styles.card}>
           <h1 style={styles.title}>{passed ? "레벨테스트 통과" : "레벨테스트 실패"}</h1>
           <p style={styles.score}>{correctCount} / {words.length}</p>
+          {!passed && (
+            <p style={styles.failText}>
+              정답이 10개 미만이라 통과하지 못했습니다.
+            </p>
+          )}
           {passed ? (
             <button style={styles.primaryBtn} onClick={handlePass}>다음 티어로 이동</button>
           ) : (
@@ -203,6 +208,12 @@ const styles = {
     fontSize: "22px",
     color: "#374151",
     marginBottom: "24px",
+  },
+  failText: {
+    textAlign: "center",
+    color: "#B91C1C",
+    fontSize: "15px",
+    margin: "0 0 24px",
   },
   choiceGrid: {
     display: "grid",
