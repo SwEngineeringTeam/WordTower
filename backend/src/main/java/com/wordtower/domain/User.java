@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -27,6 +28,7 @@ public class User {
     private int currentStreak = 0;
     private int longestStreak = 0;
     private LocalDateTime lastActivityDate;
+    private LocalDate streakCheckDate;
 
     // 스트릭 방어권 보유 개수
     @Column(nullable = false, columnDefinition = "int default 0")

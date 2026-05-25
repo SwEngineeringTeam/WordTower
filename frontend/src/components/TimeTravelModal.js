@@ -45,7 +45,7 @@ const TimeTravelModal = ({ visible, onClose }) => {
       const res = await timeTravelLastActivity(userId, daysNum, direction);
       
       const directionText = direction === "PAST" ? "과거로" : "미래로";
-      alert(`성공: ${directionText} ${daysNum}일 이동했습니다.\n${res.message}`);
+      alert(`성공: "마지막 학습일"을 ${directionText} ${daysNum}일 만큼 변경했습니다.\n${res.message}`);
       
       onClose(); // 성공하면 모달 닫기
       
@@ -79,7 +79,7 @@ const TimeTravelModal = ({ visible, onClose }) => {
               onChange={(e) => setDirection(e.target.value)}
               disabled={loading}
             />
-            과거로 이동
+            과거로 변경
           </label>
           <label className="modal-radio">
             <input
@@ -89,7 +89,7 @@ const TimeTravelModal = ({ visible, onClose }) => {
               onChange={(e) => setDirection(e.target.value)}
               disabled={loading}
             />
-            미래로 이동
+            미래로 변경
           </label>
         </div>
 

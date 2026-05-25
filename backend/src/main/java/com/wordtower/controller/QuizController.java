@@ -58,13 +58,15 @@ public class QuizController {
         Long userId = request.getUserId();
         int completedUnit = request.getCompletedUnit();
 
-        // 1. 스트릭 갱신
-        streakService.updateUserStreak(userId, true);
-
-        // 2. 다음 유닛 열기
+        // 정답이 하나 이상인 경우에만 스트릭을 증가시킵니다.
+        if (request.getCorrectCount() > 0) {
+            streakService.updateUserStreak(userId, true);
+        }
+        
+        // 다음 유닛 열기
         userService.unlockNextUnit(userId, completedUnit);
 
-        // 3. QuizRecord 저장
+        // QuizRecord 저장
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 

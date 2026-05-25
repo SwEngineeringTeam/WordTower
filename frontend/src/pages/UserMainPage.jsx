@@ -15,14 +15,14 @@ const UserMainPage = () => {
   const userId = localStorage.getItem("userId");
   const nickname = localStorage.getItem("nickname") || "Tower Learner";
 
-  const [streak, setStreak] = useState(0);
-  const [streakFreezeCount, setStreakFreezeCount] = useState(0);
+  const [streak, setStreak] = useState(Number(localStorage.getItem("currentStreak")) || 0);
+  const [streakFreezeCount, setStreakFreezeCount] = useState(Number(localStorage.getItem("streakFreezeCount")) || 0);
   const [unlockedUnits, setUnlockedUnits] = useState(
     parseInt(localStorage.getItem("unlockedUnits")) || 1
   ); 
   
   // 1. 마지막 학습일(lastActivityDate)을 담을 상태 변수 추가
-  const [lastActivityDate, setLastActivityDate] = useState(null); 
+  const [lastActivityDate, setLastActivityDate] = useState(localStorage.getItem("lastActivityDate") || null); 
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -46,6 +46,7 @@ const UserMainPage = () => {
         // 스트릭 가져오기
         const currentStreak = await getUserStreak(Number(userId));
         setStreak(currentStreak);
+        localStorage.setItem("currentStreak", currentStreak);
 
         // DB에서 유닛 진도 가져오기
         const progress = await getUserProgress(Number(userId));
@@ -63,6 +64,9 @@ const UserMainPage = () => {
         try {
           const dateStr = await getLastActivityDate(Number(userId));
           setLastActivityDate(dateStr);
+          if (dateStr) {
+            localStorage.setItem("lastActivityDate", dateStr);
+          }
         } catch (e) {
           console.warn("마지막 학습일 조회 실패", e);
         }
@@ -77,9 +81,11 @@ const UserMainPage = () => {
       try {
         const freezeCount = await getStreakFreezeCount(Number(userId));
         setStreakFreezeCount(freezeCount || 0);
+        localStorage.setItem("streakFreezeCount", freezeCount || 0);
       } catch (err) {
         console.warn("스트릭 방어권 조회 실패:", err);
         setStreakFreezeCount(0);
+        localStorage.setItem("streakFreezeCount", 0);
       }
     };
 
