@@ -8,12 +8,14 @@ import UnitResultModal from "../components/UnitResultModal";
 import "../style/UserMainPage.css";
 import Sidebar from "../components/Sidebar";
 import TopStatusBoard from "../components/TopStatusBoard";
+import UserProfile from "./UserProfile";
 
 
 const UserMainPage = () => {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
-  const nickname = localStorage.getItem("nickname") || "Tower Learner";
+  const userEmail = localStorage.getItem("email") || "";
+  const [nickname, setNickname] = useState(localStorage.getItem("nickname") || "Tower Learner");
 
   const [streak, setStreak] = useState(0);
   const [streakFreezeCount, setStreakFreezeCount] = useState(0);
@@ -29,6 +31,7 @@ const UserMainPage = () => {
   const [isStudyDone, setIsStudyDone] = useState(false); // ✅ 추가
   const [isQuizDone, setIsQuizDone] = useState(false);   // ✅ 추가
   const [resultModal, setResultModal] = useState(null); // ← 이 줄 추가
+  const [activeView, setActiveView] = useState("dashboard");
 
   // 드롭다운 열림/닫힘 상태 관리 (예: { 1: true, 2: false })
   const [expandedTiers, setExpandedTiers] = useState({});
@@ -107,6 +110,10 @@ const UserMainPage = () => {
   };
 
   const currentTier = Math.ceil(unlockedUnits / 5) || 1;
+  const handleNicknameChange = (nextNickname) => {
+    localStorage.setItem("nickname", nextNickname);
+    setNickname(nextNickname);
+  };
 
   const renderUnits = (tier, isCompletedTier = false) => {
     const startUnit = (tier - 1) * 5 + 1;
@@ -141,110 +148,126 @@ const UserMainPage = () => {
   return (
     <div className="user-main-page">
       <div className="dashboard-shell">
-        <Sidebar />
+        <Sidebar
+          activeView={activeView}
+          onDashboardClick={() => setActiveView("dashboard")}
+          onProfileClick={() => setActiveView("profile")}
+        />
         <main className="main-panel">
-          
-          {/* 3. TopStatusBoard 컴포넌트에 lastActivityDate 전달하기 */}
-          <TopStatusBoard
-            streak={streak}
-            streakFreezeCount={streakFreezeCount}
-            loading={loading}
-            nickname={nickname}
-            lastActivityDate={lastActivityDate} 
-          />
+          {activeView === "profile" ? (
+            <UserProfile
+              nickname={nickname}
+              userEmail={userEmail}
+              streak={streak}
+              currentTier={currentTier}
+              unlockedUnits={unlockedUnits}
+              onNicknameChange={handleNicknameChange}
+            />
+          ) : (
+            <>
+              {/* 3. TopStatusBoard 컴포넌트에 lastActivityDate 전달하기 */}
+              <TopStatusBoard
+                streak={streak}
+                streakFreezeCount={streakFreezeCount}
+                loading={loading}
+                nickname={nickname}
+                lastActivityDate={lastActivityDate} 
+              />
 
-          <section className="tower-area">
-            <div className="tower-skyline">
-              <div className="crane-icon">🏗️</div>
-              <div className="blueprint-label">Tower Construction</div>
-            </div>
-
-            <div className="tower-board">
-              <div className="tower-header">현재 층: Tier {currentTier}</div>
-              {renderUnits(currentTier)}
-              <div className="action-panel">
-                <div>
-                  <p className="action-label">현재 진행 유닛</p>
-                  <h3>Unit {unlockedUnits}</h3>
+              <section className="tower-area">
+                <div className="tower-skyline">
+                  <div className="crane-icon">🏗️</div>
+                  <div className="blueprint-label">Tower Construction</div>
                 </div>
-                <div className="action-buttons">
-                  {/* 단어 학습 버튼 */}
-                  <button
-                    className={`action-btn study-btn ${isStudyDone ? "done" : ""}`}
-                    onClick={() => {
-                      // ✅ markUnitAsDone 제거 - 단어 학습 완료는 MemoryCard에서 처리
-                      navigate(`/memory-card?unitId=${unlockedUnits}`);
-                    }}
-                    title={isStudyDone ? "완료! 다시 학습할 수 있어요" : "단어 암기 학습 시작"}
-                  >
-                    <span className="btn-icon">
-                    {isStudyDone
-                      ? <span style={{ fontSize: "18px", color: "#fff", fontWeight: "bold" }}>✔</span>
-                      : "📖"}
-                  </span>
-                    <span className="btn-label">단어 학습</span>
-                    {isStudyDone && <span className="done-badge">완료</span>}
-                  </button>
 
-                  {/* 퀴즈 버튼 */}
-                  <button
-                    className={`action-btn quiz-btn ${isQuizDone ? "done" : ""}`}
-                    onClick={() => {
-                      // ✅ markUnitAsDone 제거 - 퀴즈 완료는 DailyQuiz에서 처리
-                      navigate(`/quiz/${unlockedUnits}`);
-                    }}
-                    title={isQuizDone ? "완료! 다시 풀 수 있어요" : "퀴즈 풀기"}
-                  >
-                    <span className="btn-icon">
-                    {isQuizDone
-                      ? <span style={{ fontSize: "18px", color: "#fff", fontWeight: "bold" }}>✔</span>
-                      : "📝"}
-                  </span>
-                    <span className="btn-label">퀴즈</span>
-                    {isQuizDone && <span className="done-badge">완료</span>}
-                  </button>
-                  {/* 미니게임 버튼 - 항상 활성 */}
-                  <button
-                    className="action-btn mini-game-btn"
-                    onClick={() => navigate(`/mini-game?unitId=${unlockedUnits}`)}
-                    title="언제든지 즐길 수 있는 미니게임"
-                  >
-                    <span className="btn-icon">🎮</span>
-                    <span className="btn-label">미니게임</span>
-                    <span className="always-on-badge">Always ON</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {currentTier > 1 && (
-              <div className="done-panel">
-                <p>완료된 이전 층</p>
-                <div className="completed-tiers-list">
-                  {Array.from({ length: currentTier - 1 }, (_, i) => currentTier - 1 - i).map((tier) => (
-                    <div key={`tier-${tier}`} className="completed-tier-group">
-                      <button 
-                        className="tier-dropdown-btn" 
-                        onClick={() => toggleTier(tier)}
-                      >
-                        Tier {tier} 완료 <span>{expandedTiers[tier] ? '▲' : '▼'}</span>
-                      </button>
-                      {expandedTiers[tier] && (
-                        <div className="tier-dropdown-content">
-                          {renderUnits(tier, true)}
-                        </div>
-                      )}
+                <div className="tower-board">
+                  <div className="tower-header">현재 층: Tier {currentTier}</div>
+                  {renderUnits(currentTier)}
+                  <div className="action-panel">
+                    <div>
+                      <p className="action-label">현재 진행 유닛</p>
+                      <h3>Unit {unlockedUnits}</h3>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </section>
+                    <div className="action-buttons">
+                      {/* 단어 학습 버튼 */}
+                      <button
+                        className={`action-btn study-btn ${isStudyDone ? "done" : ""}`}
+                        onClick={() => {
+                          // ✅ markUnitAsDone 제거 - 단어 학습 완료는 MemoryCard에서 처리
+                          navigate(`/memory-card?unitId=${unlockedUnits}`);
+                        }}
+                        title={isStudyDone ? "완료! 다시 학습할 수 있어요" : "단어 암기 학습 시작"}
+                      >
+                        <span className="btn-icon">
+                        {isStudyDone
+                          ? <span style={{ fontSize: "18px", color: "#fff", fontWeight: "bold" }}>✔</span>
+                          : "📖"}
+                      </span>
+                        <span className="btn-label">단어 학습</span>
+                        {isStudyDone && <span className="done-badge">완료</span>}
+                      </button>
 
-          <section className="bottom-notice">
-            {error && <div className="error-text">{error}</div>}
-            <p>이 페이지는 타워 레벨 업과 스트릭 연동을 우선 반영한 대시보드 화면입니다.</p>
-          </section>
+                      {/* 퀴즈 버튼 */}
+                      <button
+                        className={`action-btn quiz-btn ${isQuizDone ? "done" : ""}`}
+                        onClick={() => {
+                          // ✅ markUnitAsDone 제거 - 퀴즈 완료는 DailyQuiz에서 처리
+                          navigate(`/quiz/${unlockedUnits}`);
+                        }}
+                        title={isQuizDone ? "완료! 다시 풀 수 있어요" : "퀴즈 풀기"}
+                      >
+                        <span className="btn-icon">
+                        {isQuizDone
+                          ? <span style={{ fontSize: "18px", color: "#fff", fontWeight: "bold" }}>✔</span>
+                          : "📝"}
+                      </span>
+                        <span className="btn-label">퀴즈</span>
+                        {isQuizDone && <span className="done-badge">완료</span>}
+                      </button>
+                      {/* 미니게임 버튼 - 항상 활성 */}
+                      <button
+                        className="action-btn mini-game-btn"
+                        onClick={() => navigate(`/mini-game?unitId=${unlockedUnits}`)}
+                        title="언제든지 즐길 수 있는 미니게임"
+                      >
+                        <span className="btn-icon">🎮</span>
+                        <span className="btn-label">미니게임</span>
+                        <span className="always-on-badge">Always ON</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {currentTier > 1 && (
+                  <div className="done-panel">
+                    <p>완료된 이전 층</p>
+                    <div className="completed-tiers-list">
+                      {Array.from({ length: currentTier - 1 }, (_, i) => currentTier - 1 - i).map((tier) => (
+                        <div key={`tier-${tier}`} className="completed-tier-group">
+                          <button 
+                            className="tier-dropdown-btn" 
+                            onClick={() => toggleTier(tier)}
+                          >
+                            Tier {tier} 완료 <span>{expandedTiers[tier] ? '▲' : '▼'}</span>
+                          </button>
+                          {expandedTiers[tier] && (
+                            <div className="tier-dropdown-content">
+                              {renderUnits(tier, true)}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </section>
+
+              <section className="bottom-notice">
+                {error && <div className="error-text">{error}</div>}
+                <p>이 페이지는 타워 레벨 업과 스트릭 연동을 우선 반영한 대시보드 화면입니다.</p>
+              </section>
+            </>
+          )}
         </main>
       </div>
     {/* 완료된 유닛 클릭 시 결과 모달 */}
