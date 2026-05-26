@@ -5,7 +5,8 @@ import { getStreakFreezeCount, getLastActivityDate } from "../services/userServi
 import { getUnitProgress } from "../services/unitProgressService";
 import UnitResultModal from "../components/UnitResultModal";
 import "../style/UserMainPage.css";
-
+import TimeTravelModal from "../components/TimeTravelModal";
+import AddExpModal from "../components/AddExpModal";
 /* ══════════════════════════════════════
    픽셀 UI 서브 컴포넌트
 ══════════════════════════════════════ */
@@ -122,6 +123,8 @@ const UserMainPage = () => {
   const [isStudyDone,      setIsStudyDone]       = useState(false);
   const [isQuizDone,       setIsQuizDone]        = useState(false);
   const [resultModal,      setResultModal]       = useState(null);
+  const [showTimeTravelModal, setShowTimeTravelModal] = useState(false); // ← 추가
+  const [showAddExpModal,     setShowAddExpModal]     = useState(false); // ← 추가
 
   // ── 픽셀 UI 전용 상태 ──
   const [activeTab,  setActiveTab]  = useState("dashboard");
@@ -228,6 +231,7 @@ const UserMainPage = () => {
 
   return (
     <div className="wt-root">
+      
 
       {/* ══ 헤더 ══ */}
       <header className="wt-header">
@@ -262,6 +266,26 @@ const UserMainPage = () => {
           <button className="hdr-btn">설정</button>
           <button className="hdr-btn">나의 단어장</button>
           <button className="hdr-btn">복습하기</button>
+          {/* ← 여기서부터 추가 */}
+          {localStorage.getItem("email") === "user@test.com" && (
+            <>
+              <button className="hdr-btn" onClick={() => setShowTimeTravelModal(true)}>
+                Time Travel (Test)
+              </button>
+              <button className="hdr-btn" onClick={() => setShowAddExpModal(true)}>
+                Add EXP (Test)
+              </button>
+              <TimeTravelModal
+                visible={showTimeTravelModal}
+                onClose={() => setShowTimeTravelModal(false)}
+              />
+              <AddExpModal
+                visible={showAddExpModal}
+                onClose={() => setShowAddExpModal(false)}
+              />
+            </>
+          )}
+          {/* ← 여기까지 추가 */}
         </div>
       </header>
 
