@@ -70,16 +70,25 @@ public class UserService {
      * 토익 점수를 기반으로 초기 학습 단계(Floor)를 자동 계산하는 로직
      */
     private int calculateInitialFloor(Integer score) {
-        if (score == null || score <= 200) {
-            return 1; 
-        }
-        
-        if (score > 990) {
-            score = 990;
-        }
-
-        return ((score - 1) / 200) + 1;
+    if (score == null) {
+        return 1;
     }
+
+    // TOEIC 범위 제한
+    score = Math.max(0, Math.min(score, 990));
+
+    if (score <= 200) {
+        return 1;
+    } else if (score <= 400) {
+        return 2;
+    } else if (score <= 600) {
+        return 3;
+    } else if (score <= 800) {
+        return 4;
+    } else {
+        return 5;
+    }
+}
 
      /* 사용자의 마지막 학습일(lastActivityDate)을 문자열로 조회 */
     public String getLastActivityDate(Long userId) {
