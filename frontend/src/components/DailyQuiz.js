@@ -331,9 +331,8 @@ const loadQuiz = (baseWords) => {
       localStorage.setItem("unlockedUnits", String(nextUnit));
     }
 
-    // 프론트 화면 반영용: 스트릭 1 증가
-    const currentLocalStreak = Number(localStorage.getItem("streak")) || 0;
-    localStorage.setItem("streak", String(currentLocalStreak + 1));
+    const previousStreak = Number(localStorage.getItem("currentStreak") ?? localStorage.getItem("streak")) || 0;
+    const nextStreak = previousStreak + 1;
 
     // ✅ 추가: UnitResultModal에서 사용할 퀴즈 결과 저장
     const total = quizWords.length;
@@ -346,22 +345,24 @@ const loadQuiz = (baseWords) => {
     
     try {
       const total = quizWords.length;
-      // ✅ 수정: results에 이미 마지막 문제까지 포함되어 있으므로 isCorrect 따로 더하지 않음
       const correct = results.filter(r => r.correct).length;
 
-      // ✅ 수정: details도 results에서만 생성 — 마지막 문제 수동 추가 블록 삭제
       const details = results.map(r => ({
         spelling: r.word,
         userAnswer: r.userAnswer,
         isCorrect: r.correct,
-        meaning: r.meaning  // ✅ 추가
+        meaning: r.meaning
       }));
-      
 
       const result = await submitQuizAndUpdateStreak(Number(userId), Number(unitId), total, correct, details);
       console.log("퀴즈 완료 → unit/streak 갱신 성공:", result);
 
-      // ✅ 퀴즈 완료 시에만 완료 상태 저장
+      if (result?.streakIncreased) {
+        localStorage.setItem("streak", String(nextStreak));
+        localStorage.setItem("currentStreak", String(nextStreak));
+        window.alert(`축하합니다! 오늘 퀴즈를 완료해 스트릭을 ${previousStreak}일에서 ${nextStreak}일로 증가시켰습니다!`);
+      }
+
       const parsedUserId = Number(userId);
       if (!isNaN(parsedUserId) && parsedUserId > 0) {
         await fetch(

@@ -28,18 +28,9 @@ public class StreakController {
     @PostMapping("/{userId}/update")
     public ResponseEntity<String> updateStreakAfterQuiz(
             @PathVariable Long userId,
-            @RequestBody QuizSubmitRequest request) { 
-        
-        // QuizRecord의 correctCount(맞힌 문제 수)가 0보다 크면 퀴즈를 완료한 것으로 인정합니다.
-        boolean quizCompleted = request.getCorrectCount() > 0; 
+            @RequestBody QuizSubmitRequest request) {
 
-        // 스트릭 갱신 서비스 호출
-        streakService.updateUserStreak(userId, quizCompleted);
-        
-        if (quizCompleted) {
-            return ResponseEntity.ok("Quiz submitted and streak updated.");
-        } else {
-            return ResponseEntity.ok("No questions solved. Streak not updated.");
-        }
+        // 스트릭 갱신 로직은 로그인 시 처리됩니다.
+        return ResponseEntity.ok("Streak update is handled on login, not on quiz submission.");
     }
 }

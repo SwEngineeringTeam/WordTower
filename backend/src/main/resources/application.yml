@@ -5,7 +5,7 @@ spring:
     # MySQL 계정 아이디
     username: root
     # MySQL 계정 비밀번호
-    password: "1234"
+    password: "mysql"
 
     driver-class-name: com.mysql.cj.jdbc.Driver
 

@@ -5,6 +5,11 @@ import com.wordtower.dto.LoginRequest;
 import com.wordtower.dto.LoginResponse; 
 import com.wordtower.repository.UserRepository; // 💡 DB 조회를 위해 임포트 추가
 import lombok.RequiredArgsConstructor; // 💡 생성자 주입을 위해 추가
+import com.wordtower.dto.LoginRequest;
+import com.wordtower.dto.LoginResponse;
+import com.wordtower.repository.UserRepository;
+import com.wordtower.service.StreakService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +23,8 @@ import java.util.Map;
 public class LoginController {
 
     private final UserRepository userRepository; // 💡 DB에 접근할 수 있도록 주입받습니다.
+    private final StreakService streakService;
+
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
@@ -33,15 +40,22 @@ public class LoginController {
                     .body(Map.of("message", "아이디 또는 비밀번호가 틀렸습니다."));
         }
 
-        // 3. [로그인 성공] DB에서 조회한 실제 유저의 정보(ID, 역할, 닉네임)를 담아 응답합니다.
-        // 토큰은 시큐리티가 없으므로 기존처럼 가짜 토큰(fake-token) 형태로 유지하되, 유저 정보를 실어줍니다.
-        String fakeToken = "fake-jwt-token-" + user.getRole().toString().toLowerCase();
-        
+        String streakMessage = streakService.validateStreakOnLogin(user.getId());
+        user = userRepository.findById(user.getId())
+                .orElseThrow(() -> new RuntimeException("User not found after streak validation"));
+
+        String token = "fake-jwt-token-" + (user.getRole() == User.Role.ADMIN ? "admin" : "user");
+
         return ResponseEntity.ok(new LoginResponse(
                 user.getId(),
-                fakeToken,
-                user.getRole().toString(),
-                user.getNickname()
+                token,
+                user.getRole().name(),
+                user.getNickname(),
+                user.getCurrentStreak(),
+                user.getStreakFreezeCount(),
+                user.getLastActivityDate() != null ? user.getLastActivityDate().toString() : null,
+                user.getEmail(),
+                streakMessage
         ));
     }
 }

@@ -22,76 +22,111 @@ public class StreakService {
     private final UserRepository userRepository;
 
     /**
-     * 사용자의 스트릭을 갱신. (퀴즈 완료 시 호출됨.)
-     * KST 자정 기준으로 전날 활동이 없으면 방어권을 소모하여 스트릭을 유지하거나, 
-     * 방어권이 부족하면 스트릭을 1로 초기화합니다.
-     * longestStreak은 최대값으로 갱신.
-     * 
+     * 로그인 시 호출되는 스트릭 지속성 검증.
+     * 마지막 학습일과 streak freeze 개수를 기준으로 스트릭 연결 여부를 판단합니다.
+     * 필요 시 freeze를 차감하거나 스트릭을 초기화하며, 메시지를 반환합니다.
+     *
      * @param userId 사용자 ID
-     * @param quizCompleted 퀴즈 완료 여부 (true: 1개 이상 완료 시 인정)
+     * @return 로그인 시 표시할 메시지 또는 null
      */
     @Transactional
-    public void updateUserStreak(Long userId, boolean quizCompleted) {
+    public String validateStreakOnLogin(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (!quizCompleted) {
-            return; // 퀴즈 미완료 시 갱신하지 않음
-        }
-
-        // KST 기준 오늘 날짜
         ZonedDateTime nowKst = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
         LocalDate today = nowKst.toLocalDate();
 
-        // 마지막 활동 날짜 (KST로 변환)
         LocalDate lastActivity = user.getLastActivityDate() != null
                 ? user.getLastActivityDate().atZone(ZoneId.of("Asia/Seoul")).toLocalDate()
                 : null;
 
-        int newCurrentStreak;
+        user.setStreakCheckDate(today);
+        String message = null;
 
-        // 1. 처음 퀴즈를 푸는 경우 (기록이 없을 때)
+        if (lastActivity == null) {
+            userRepository.save(user);
+            return null;
+        }
+
+        if (lastActivity.equals(today) || lastActivity.equals(today.minusDays(1))) {
+            userRepository.save(user);
+            return null;
+        }
+
+        long missedDays = ChronoUnit.DAYS.between(lastActivity, today) - 1;
+        int currentFreezes = user.getStreakFreezeCount();
+
+        if (missedDays > 0 && currentFreezes >= missedDays) {
+            user.setStreakFreezeCount(currentFreezes - (int) missedDays);
+            message = missedDays + "일에 대해 freeze 아이템 " + missedDays + "개를 사용했어요! 남은 freeze 아이템은 "
+                    + user.getStreakFreezeCount() + "개 입니다.";
+        } else {
+            user.setCurrentStreak(0);
+            message = "마지막 접속일로부터 " + missedDays + "일이 지나서 스트릭이 깨졌어요...";
+        }
+
+        userRepository.save(user);
+        return message;
+    }
+
+    /**
+     * 사용자의 스트릭을 갱신. (퀴즈 완료 시 호출됨.)
+     * KST 자정 기준으로 퀴즈 완료 날짜를 기준으로 스트릭을 증가시킵니다.
+     * longestStreak은 최대값으로 갱신합니다.
+     *
+     * @param userId 사용자 ID
+     * @param quizCompleted 퀴즈 완료 여부
+     */
+    @Transactional
+    public boolean updateUserStreak(Long userId, boolean quizCompleted) {
+        if (!quizCompleted) {
+            return false;
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        ZonedDateTime nowKst = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+        LocalDate today = nowKst.toLocalDate();
+
+        LocalDate lastActivity = user.getLastActivityDate() != null
+                ? user.getLastActivityDate().atZone(ZoneId.of("Asia/Seoul")).toLocalDate()
+                : null;
+
+        if (lastActivity != null && lastActivity.equals(today)) {
+            return false;
+        }
+
+        int oldStreak = user.getCurrentStreak();
+        int newCurrentStreak;
         if (lastActivity == null) {
             newCurrentStreak = 1;
-        } 
-        // 2. 오늘 이미 푼 경우 (중복 갱신 방지)
-        else if (lastActivity.equals(today)) {
-            return; 
-        } 
-        // 3. 어제 풀고 오늘 또 푸는 경우 (정상적인 연속 학습)
-        else if (lastActivity.equals(today.minusDays(1))) {
+        } else if (lastActivity.equals(today.minusDays(1))) {
             newCurrentStreak = user.getCurrentStreak() + 1;
-        } 
-        // 4. 하루 이상 학습을 쉬었을 경우 (스트릭 방어권 로직 발동)
-        else {
-            // 마지막 접속일과 오늘 사이의 결석 일수 계산
-            long missedDays = ChronoUnit.DAYS.between(lastActivity, today) - 1;
+        } else if (user.getStreakCheckDate() != null && user.getStreakCheckDate().equals(today)) {
+            newCurrentStreak = user.getCurrentStreak() > 0 ? user.getCurrentStreak() + 1 : 1;
+        } else {
+            long missedDays = lastActivity == null ? 0 : ChronoUnit.DAYS.between(lastActivity, today) - 1;
             int currentFreezes = user.getStreakFreezeCount();
-
-            // 보유한 방어권이 결석 일수보다 많거나 같으면 방어 성공
-            if (currentFreezes >= missedDays && missedDays > 0) {
-                user.setStreakFreezeCount((int) (currentFreezes - missedDays)); // 사용한 만큼 방어권 차감
-                newCurrentStreak = user.getCurrentStreak() + 1; // 스트릭을 이어서 +1 처리
+            if (missedDays > 0 && currentFreezes >= missedDays) {
+                user.setStreakFreezeCount(currentFreezes - (int) missedDays);
+                newCurrentStreak = user.getCurrentStreak() + 1;
             } else {
-                // 방어권이 부족하면 스트릭이 깨짐 (1부터 다시 시작)
                 newCurrentStreak = 1;
-
-                // 남은 방어권 개수를 0으로 변경
                 user.setStreakFreezeCount(0);
             }
         }
 
-        // longestStreak 갱신
         int newLongestStreak = Math.max(user.getLongestStreak(), newCurrentStreak);
-
-        // DB 갱신
         user.setCurrentStreak(newCurrentStreak);
         user.setLongestStreak(newLongestStreak);
-        user.setLastActivityDate(nowKst.toLocalDateTime()); // KST 시간 저장
+        user.setLastActivityDate(nowKst.toLocalDateTime());
+        user.setStreakCheckDate(null);
         userRepository.save(user);
+        return newCurrentStreak > oldStreak;
     }
 
-    
     /**
      * 사용자의 현재 스트릭을 조회합니다.
      * @param userId 사용자 ID

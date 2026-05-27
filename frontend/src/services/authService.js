@@ -13,6 +13,11 @@ export const login = async (email, password) => {
       localStorage.setItem("role", response.data.role); // 'ADMIN' 또는 'USER'
       localStorage.setItem("userId", response.data.userId);
       localStorage.setItem("nickname", response.data.nickname || "");
+      localStorage.setItem("currentStreak", response.data.currentStreak || 0);
+      localStorage.setItem("streakFreezeCount", response.data.streakFreezeCount || 0);
+      if (response.data.lastActivityDate) {
+        localStorage.setItem("lastActivityDate", response.data.lastActivityDate);
+      }
       // store email locally so UI can perform conditional rendering for test accounts
       if (response.data.email) {
         localStorage.setItem("email", response.data.email);
