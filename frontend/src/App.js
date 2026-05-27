@@ -5,7 +5,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Homepage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import UserMainPage from "./pages/UserMainPage";
-import LevelTestPage from "./pages/LevelTestPage";
 import MiniGamePage from "./pages/MiniGamePage"; // ✅ 추가
 
 // 기존 관리자 컴포넌트
@@ -31,7 +30,6 @@ function App() {
         {/* 3. 일반 유저 메인 대시보드 */}
         <Route path="/user" element={<UserMainPage />} />
         <Route path="/quiz/:unitId" element={<DailyQuiz />} />
-        <Route path="/level-test/:tier" element={<LevelTestPage />} />
 
         {/* 4. 관리자 페이지 */}
         <Route path="/admin" element={<WordManager />} />

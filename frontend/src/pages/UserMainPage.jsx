@@ -8,12 +8,14 @@ import UnitResultModal from "../components/UnitResultModal";
 import "../style/UserMainPage.css";
 import Sidebar from "../components/Sidebar";
 import TopStatusBoard from "../components/TopStatusBoard";
+import UserProfile from "./UserProfile";
 
 
 const UserMainPage = () => {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
-  const nickname = localStorage.getItem("nickname") || "Tower Learner";
+  const userEmail = localStorage.getItem("email") || "";
+  const [nickname, setNickname] = useState(localStorage.getItem("nickname") || "Tower Learner");
 
   const [streak, setStreak] = useState(0);
   const [streakFreezeCount, setStreakFreezeCount] = useState(0);
@@ -29,6 +31,7 @@ const UserMainPage = () => {
   const [isStudyDone, setIsStudyDone] = useState(false); // ✅ 추가
   const [isQuizDone, setIsQuizDone] = useState(false);   // ✅ 추가
   const [resultModal, setResultModal] = useState(null); // ← 이 줄 추가
+  const [activeView, setActiveView] = useState("dashboard");
 
   // 드롭다운 열림/닫힘 상태 관리 (예: { 1: true, 2: false })
   const [expandedTiers, setExpandedTiers] = useState({});
@@ -50,13 +53,7 @@ const UserMainPage = () => {
         // DB에서 유닛 진도 가져오기
         const progress = await getUserProgress(Number(userId));
         const localProgress = parseInt(localStorage.getItem("unlockedUnits")) || 1;
-        const savedProgress = Math.max(Number(progress) || 1, localProgress);
-        const previousTier = Math.floor((savedProgress - 1) / 5);
-        const hasPassedLevelTest = localStorage.getItem(`levelTestPassed_tier_${previousTier}`) === "true";
-        const finalProgress =
-          savedProgress > 1 && savedProgress % 5 === 1 && !hasPassedLevelTest
-            ? Math.max(savedProgress - 1, 1)
-            : savedProgress;
+        const finalProgress = Math.max(Number(progress) || 1, localProgress);
         setUnlockedUnits(finalProgress);
 
         // ✅ 추가: 현재 유닛 완료 상태 조회
@@ -97,7 +94,7 @@ const UserMainPage = () => {
   const onUnitClick = (unitNum) => {
     if (unitNum > unlockedUnits) return;
 
-    if (unitNum < unlockedUnits || (isLevelTestReady && unitNum === unlockedUnits)) {
+    if (unitNum < unlockedUnits) {
       // Number()로 확실하게 숫자 변환
       setResultModal({ unitId: Number(unitNum), unitName: `Unit ${unitNum}` });
     } else {
@@ -113,7 +110,10 @@ const UserMainPage = () => {
   };
 
   const currentTier = Math.ceil(unlockedUnits / 5) || 1;
-  const isLevelTestReady = unlockedUnits % 5 === 0 && isQuizDone;
+  const handleNicknameChange = (nextNickname) => {
+    localStorage.setItem("nickname", nextNickname);
+    setNickname(nextNickname);
+  };
 
   const renderUnits = (tier, isCompletedTier = false) => {
     const startUnit = (tier - 1) * 5 + 1;
@@ -124,7 +124,7 @@ const UserMainPage = () => {
         {units.map((unitNum) => {
           const locked = unitNum > unlockedUnits;
           // 현재 진행 유닛보다 작으면 완료된 유닛
-          const isCompleted = unitNum < unlockedUnits || (isLevelTestReady && unitNum === unlockedUnits);
+          const isCompleted = unitNum < unlockedUnits;
 
           return (
             <button
@@ -148,44 +148,47 @@ const UserMainPage = () => {
   return (
     <div className="user-main-page">
       <div className="dashboard-shell">
-        <Sidebar />
+        <Sidebar
+          activeView={activeView}
+          onDashboardClick={() => setActiveView("dashboard")}
+          onProfileClick={() => setActiveView("profile")}
+        />
         <main className="main-panel">
-          
-          {/* 3. TopStatusBoard 컴포넌트에 lastActivityDate 전달하기 */}
-          <TopStatusBoard
-            streak={streak}
-            streakFreezeCount={streakFreezeCount}
-            loading={loading}
-            nickname={nickname}
-            lastActivityDate={lastActivityDate} 
-          />
+          {activeView === "profile" ? (
+            <UserProfile
+              nickname={nickname}
+              userEmail={userEmail}
+              streak={streak}
+              currentTier={currentTier}
+              unlockedUnits={unlockedUnits}
+              onNicknameChange={handleNicknameChange}
+            />
+          ) : (
+            <>
+              {/* 3. TopStatusBoard 컴포넌트에 lastActivityDate 전달하기 */}
+              <TopStatusBoard
+                streak={streak}
+                streakFreezeCount={streakFreezeCount}
+                loading={loading}
+                nickname={nickname}
+                lastActivityDate={lastActivityDate} 
+              />
 
-          <section className="tower-area">
-            <div className="tower-skyline">
-              <div className="crane-icon">🏗️</div>
-              <div className="blueprint-label">Tower Construction</div>
-            </div>
-
-            <div className="tower-board">
-              <div className="tower-header">현재 층: Tier {currentTier}</div>
-              {renderUnits(currentTier)}
-              <div className="action-panel">
-                <div>
-                  <p className="action-label">현재 진행 유닛</p>
-                  <h3>Unit {unlockedUnits}</h3>
+              <section className="tower-area">
+                <div className="tower-skyline">
+                  <div className="crane-icon">🏗️</div>
+                  <div className="blueprint-label">Tower Construction</div>
                 </div>
-                <div className="action-buttons">
-                  {isLevelTestReady ? (
-                    <button
-                      className="action-btn level-test-action-btn"
-                      onClick={() => navigate(`/level-test/${currentTier}`)}
-                      title="레벨테스트 시작"
-                    >
-                      <span className="btn-icon">🚀</span>
-                      <span className="btn-label">Level Test</span>
-                    </button>
-                  ) : (
-                    <>
+
+                <div className="tower-board">
+                  <div className="tower-header">현재 층: Tier {currentTier}</div>
+                  {renderUnits(currentTier)}
+                  <div className="action-panel">
+                    <div>
+                      <p className="action-label">현재 진행 유닛</p>
+                      <h3>Unit {unlockedUnits}</h3>
+                    </div>
+                    <div className="action-buttons">
                       {/* 단어 학습 버튼 */}
                       <button
                         className={`action-btn study-btn ${isStudyDone ? "done" : ""}`}
@@ -231,40 +234,40 @@ const UserMainPage = () => {
                         <span className="btn-label">미니게임</span>
                         <span className="always-on-badge">Always ON</span>
                       </button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {currentTier > 1 && (
-              <div className="done-panel">
-                <p>완료된 이전 층</p>
-                <div className="completed-tiers-list">
-                  {Array.from({ length: currentTier - 1 }, (_, i) => currentTier - 1 - i).map((tier) => (
-                    <div key={`tier-${tier}`} className="completed-tier-group">
-                      <button 
-                        className="tier-dropdown-btn" 
-                        onClick={() => toggleTier(tier)}
-                      >
-                        Tier {tier} 완료 <span>{expandedTiers[tier] ? '▲' : '▼'}</span>
-                      </button>
-                      {expandedTiers[tier] && (
-                        <div className="tier-dropdown-content">
-                          {renderUnits(tier, true)}
-                        </div>
-                      )}
                     </div>
-                  ))}
+                  </div>
                 </div>
-              </div>
-            )}
-          </section>
 
-          <section className="bottom-notice">
-            {error && <div className="error-text">{error}</div>}
-            <p>이 페이지는 타워 레벨 업과 스트릭 연동을 우선 반영한 대시보드 화면입니다.</p>
-          </section>
+                {currentTier > 1 && (
+                  <div className="done-panel">
+                    <p>완료된 이전 층</p>
+                    <div className="completed-tiers-list">
+                      {Array.from({ length: currentTier - 1 }, (_, i) => currentTier - 1 - i).map((tier) => (
+                        <div key={`tier-${tier}`} className="completed-tier-group">
+                          <button 
+                            className="tier-dropdown-btn" 
+                            onClick={() => toggleTier(tier)}
+                          >
+                            Tier {tier} 완료 <span>{expandedTiers[tier] ? '▲' : '▼'}</span>
+                          </button>
+                          {expandedTiers[tier] && (
+                            <div className="tier-dropdown-content">
+                              {renderUnits(tier, true)}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </section>
+
+              <section className="bottom-notice">
+                {error && <div className="error-text">{error}</div>}
+                <p>이 페이지는 타워 레벨 업과 스트릭 연동을 우선 반영한 대시보드 화면입니다.</p>
+              </section>
+            </>
+          )}
         </main>
       </div>
     {/* 완료된 유닛 클릭 시 결과 모달 */}

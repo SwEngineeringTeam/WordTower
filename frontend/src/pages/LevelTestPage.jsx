@@ -12,7 +12,7 @@ const shuffle = (items) => {
 };
 
 /**
- * 해당 티어의 5개 유닛 단어를 모아 레벨테스트 단어를 만듭니다.
+ * 해당 티어의 5개 유닛 단어를 모아 레벨테스트 문제를 만듭니다.
  */
 const fetchTierWords = async (tier) => {
   const startUnit = (tier - 1) * 5 + 1;
@@ -61,7 +61,7 @@ const LevelTestPage = () => {
   }, [question, words]);
 
   /**
-   * 선택한 뜻을 채점하고 다음 문제로 넘어갑니다.
+   * 선택한 답을 채점하고 다음 문제로 넘어갑니다.
    */
   const handleChoice = (meaning) => {
     if (selected || !question) return;
@@ -80,7 +80,7 @@ const LevelTestPage = () => {
   };
 
   /**
-   * 통과 시 서버와 로컬 진행도를 다음 티어로 갱신합니다.
+   * 통과 시 서버와 로컬 진행도를 갱신하고 다음 티어로 이동합니다.
    */
   const handlePass = async () => {
     if (!userId) {
@@ -96,7 +96,7 @@ const LevelTestPage = () => {
       localStorage.setItem("unlockedUnits", String(openedUnit));
       navigate("/user");
     } catch (e) {
-      setError("다음 티어 오픈에 실패했습니다.");
+      setError("다음 티어 해금에 실패했습니다.");
     }
   };
 
