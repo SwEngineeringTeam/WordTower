@@ -203,6 +203,7 @@ const UserMainPage = () => {
     }
   };
   const currentTier = Math.ceil(unlockedUnits / 5) || 1;
+  const isLevelTestReady = unlockedUnits % 5 === 0 && isQuizDone;
 
 const getUnitStatus = (unitNum) => {
   if (unitNum < unlockedUnits) return "done";
@@ -423,28 +424,40 @@ const handleNicknameChange = (nextNickname) => {
                   <div className="activity-panel">
                     <div className="panel-header">학습 활동</div>
                     <div className="act-row">
+                    {isLevelTestReady ? (
+                      // 이렇게 변경
                       <button
-                        className={`act-btn sky ${isStudyDone ? "act-done" : ""}`}
-                        onClick={() => navigate(`/memory-card?unitId=${unlockedUnits}`)}
+                        className="act-btn level-test"
+                        onClick={() => navigate(`/level-test/${currentTier}`)}
                       >
-                        {isStudyDone ? "✔" : "📖"} 단어 학습
-                        {isStudyDone && <span className="act-done-badge">완료</span>}
+                        🚀 레벨 테스트
                       </button>
-                      <button
-                        className={`act-btn sky ${isQuizDone ? "act-done" : ""}`}
-                        onClick={() => navigate(`/quiz/${unlockedUnits}`)}
-                      >
-                        {isQuizDone ? "✔" : "✏️"} 퀴즈
-                        {isQuizDone && <span className="act-done-badge">완료</span>}
-                      </button>
-                      <button
-                        className="act-btn purple"
-                        onClick={() => navigate(`/mini-game?unitId=${unlockedUnits}`)}
-                      >
-                        🎮 미니게임
-                        <span className="act-always-badge">Always ON</span>
-                      </button>
-                    </div>
+                    ) : (
+                      <>
+                        <button
+                          className={`act-btn sky ${isStudyDone ? "act-done" : ""}`}
+                          onClick={() => navigate(`/memory-card?unitId=${unlockedUnits}`)}
+                        >
+                          {isStudyDone ? "✔" : "📖"} 단어 학습
+                          {isStudyDone && <span className="act-done-badge">완료</span>}
+                        </button>
+                        <button
+                          className={`act-btn sky ${isQuizDone ? "act-done" : ""}`}
+                          onClick={() => navigate(`/quiz/${unlockedUnits}`)}
+                        >
+                          {isQuizDone ? "✔" : "✏️"} 퀴즈
+                          {isQuizDone && <span className="act-done-badge">완료</span>}
+                        </button>
+                        <button
+                          className="act-btn purple"
+                          onClick={() => navigate(`/mini-game?unitId=${unlockedUnits}`)}
+                        >
+                          🎮 미니게임
+                          <span className="act-always-badge">Always ON</span>
+                        </button>
+                      </>
+                    )}
+                  </div>
                   </div>
 
                   {/* 유닛 버튼 행 */}

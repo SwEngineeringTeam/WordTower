@@ -805,3 +805,13 @@
   flex-direction: column;
   width: min(340px, 64vw);
 }
+/* 레벨 테스트 버튼 */
+.act-btn.level-test {
+  background: #F4C430;
+  color: #3E2723;
+  box-shadow: 0 4px 0 #c49a00;
+}
+
+.act-btn.level-test:hover {
+  background: #FFD700;
+}
