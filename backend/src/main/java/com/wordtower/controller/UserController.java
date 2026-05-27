@@ -1,5 +1,6 @@
 package com.wordtower.controller;
 
+import com.wordtower.dto.RegisterRequest;
 import java.util.HashMap;
 import java.util.Map;
 import com.wordtower.dto.StreakFreezeRewardRequest;
@@ -15,6 +16,12 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+
+    @PostMapping("/register")
+    public ResponseEntity<String> registerUser(@RequestBody RegisterRequest request) {
+        userService.register(request);
+        return ResponseEntity.ok("회원가입이 성공적으로 완료되었습니다.");
+    }
 
     /**
      * 사용자의 마지막 학습일(lastActivityDate) 조회 API

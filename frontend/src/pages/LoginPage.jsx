@@ -65,7 +65,20 @@ const LoginPage = () => {
 
         <div className="login-footer">
           <p>
-            계정이 없으신가요? <button>회원가입</button>
+            계정이 없으신가요? {/* 이 버튼 부분을 아래와 같이 수정합니다 */}
+            <button
+              type="button"
+              onClick={() => navigate("/register")}
+              style={{
+                border: "none",
+                background: "none",
+                color: "#2563eb",
+                cursor: "pointer",
+                textDecoration: "underline",
+              }}
+            >
+              회원가입
+            </button>
           </p>
         </div>
       </div>
