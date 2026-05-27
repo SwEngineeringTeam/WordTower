@@ -44,13 +44,7 @@ const UserMainPage = () => {
 
         const progress = await getUserProgress(Number(userId));
         const localProgress = parseInt(localStorage.getItem("unlockedUnits"), 10) || 1;
-        const savedProgress = Math.max(Number(progress) || 1, localProgress);
-        const previousTier = Math.floor((savedProgress - 1) / 5);
-        const hasPassedLevelTest = localStorage.getItem(`levelTestPassed_tier_${previousTier}`) === "true";
-        const finalProgress =
-          savedProgress > 1 && savedProgress % 5 === 1 && !hasPassedLevelTest
-            ? Math.max(savedProgress - 1, 1)
-            : savedProgress;
+        const finalProgress = Math.max(Number(progress) || 1, localProgress);
 
         setUnlockedUnits(finalProgress);
 
