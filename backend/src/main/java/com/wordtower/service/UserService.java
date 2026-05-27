@@ -100,13 +100,13 @@ public class UserService {
     if (score <= 200) {
         return 1;
     } else if (score <= 400) {
-        return 2;
+        return 6;   // 2티어
     } else if (score <= 600) {
-        return 3;
+        return 11;  // 3티어
     } else if (score <= 800) {
-        return 4;
+        return 16;  // 4티어
     } else {
-        return 5;
+        return 21;  // 5티어
     }
 }
 

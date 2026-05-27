@@ -1,10 +1,13 @@
 // src/pages/UserProfile.jsx
 import React, { useState } from "react";
-import "../style/UserProfile.css";  // ← ../ 로 한 단계 올라가야 함
+import "../style/UserProfile.css"; // ← ../ 로 한 단계 올라가야 함
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 const UserProfile = ({ nickname, userEmail, streak, currentTier, unlockedUnits, onNicknameChange }) => {
 =======
+=======
+>>>>>>> fix/register
 const UserProfile = ({
   nickname,
   userEmail,
@@ -13,8 +16,11 @@ const UserProfile = ({
   unlockedUnits,
   onNicknameChange,
 }) => {
+<<<<<<< HEAD
   // 수정 모드 상태 관리 (true일 때 입력창으로 변경)
 >>>>>>> feature/register
+=======
+>>>>>>> fix/register
   const [isEditing, setIsEditing] = useState(false);
   const [editNickname, setEditNickname] = useState(nickname);
 
@@ -43,7 +49,6 @@ const UserProfile = ({
 
   return (
     <section className="profile-section">
-
       {/* 프로필 헤더 카드 */}
       <div className="profile-header-card">
         <div className="profile-avatar">👤</div>
@@ -100,7 +105,6 @@ const UserProfile = ({
 
       {/* 스탯 카드 그리드 */}
       <div className="profile-grid">
-
         <div className="profile-stat-card">
           <span className="stat-icon">🔥</span>
           <div className="stat-info">
@@ -130,10 +134,14 @@ const UserProfile = ({
         <div className="profile-stat-card progress-card-full">
           <span className="stat-icon">📊</span>
 <<<<<<< HEAD
+<<<<<<< HEAD
           <div className="stat-info">
 =======
           <div className="stat-info" style={{ width: "100%" }}>
 >>>>>>> feature/register
+=======
+          <div className="stat-info">
+>>>>>>> fix/register
             <p className="stat-label">현재 층(Tier) 진행도</p>
             <div className="progress-bar-container">
               <div
@@ -148,7 +156,6 @@ const UserProfile = ({
             </p>
           </div>
         </div>
-
       </div>
     </section>
   );
