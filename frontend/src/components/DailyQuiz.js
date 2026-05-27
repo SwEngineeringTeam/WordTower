@@ -327,7 +327,9 @@ const loadQuiz = (baseWords) => {
 
     // 프론트 화면 반영용: 다음 유닛 열기
     const nextUnit = Number(unitId) + 1;
-    localStorage.setItem("unlockedUnits", String(nextUnit));
+    if (Number(unitId) % 5 !== 0) {
+      localStorage.setItem("unlockedUnits", String(nextUnit));
+    }
 
     // 프론트 화면 반영용: 스트릭 1 증가
     const currentLocalStreak = Number(localStorage.getItem("streak")) || 0;

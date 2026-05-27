@@ -116,6 +116,7 @@ const UserMainPage = () => {
   const userEmail = localStorage.getItem("email") || "";
   const [nickname, setNickname] = useState(localStorage.getItem("nickname") || "Tower Learner");
 
+
   // ── 상태 (최신 코드 그대로) ──
   const [streak,           setStreak]           = useState(0);
   const [streakFreezeCount,setStreakFreezeCount] = useState(0);
@@ -138,6 +139,7 @@ const UserMainPage = () => {
 
   const TOTAL_TIERS = 3;
 
+
   // ── 데이터 fetch (최신 코드 그대로) ──
   useEffect(() => {
     if (!userId) { navigate("/login"); return; }
@@ -148,8 +150,7 @@ const UserMainPage = () => {
 
         const currentStreak = await getUserStreak(Number(userId));
         setStreak(currentStreak);
-
-        const progress      = await getUserProgress(Number(userId));
+        const progress = await getUserProgress(Number(userId));
         const localProgress = parseInt(localStorage.getItem("unlockedUnits")) || 1;
         const finalProgress = Math.max(Number(progress) || 1, localProgress);
         setUnlockedUnits(finalProgress);
@@ -184,14 +185,14 @@ const UserMainPage = () => {
     fetchData();
   }, [navigate, userId]);
 
-  // ── 핸들러 (최신 코드 그대로) ──
+
   const onUnitClick = (unitNum) => {
     if (unitNum > unlockedUnits) return;
     if (unitNum < unlockedUnits) {
       setResultModal({ unitId: Number(unitNum), unitName: `Unit ${unitNum}` });
-    } else {
-      navigate(`/memory-card?unitId=${unitNum}`);
+      return;
     }
+    navigate(`/memory-card?unitId=${unitNum}`);
   };
 
   const handleTierClick = (tier) => {
@@ -238,6 +239,9 @@ const handleNicknameChange = (nextNickname) => {
     });
   };
 
+
+  
+
   return (
     <div className="wt-root">
       
@@ -278,6 +282,7 @@ const handleNicknameChange = (nextNickname) => {
           {/* ← 여기서부터 추가 */}
           {localStorage.getItem("email") === "user@test.com" && (
             <>
+
               <button className="hdr-btn" onClick={() => setShowTimeTravelModal(true)}>
                 Time Travel (Test)
               </button>
@@ -292,6 +297,9 @@ const handleNicknameChange = (nextNickname) => {
                 visible={showAddExpModal}
                 onClose={() => setShowAddExpModal(false)}
               />
+
+              
+
             </>
           )}
           {/* ← 여기까지 추가 */}
@@ -457,12 +465,14 @@ const handleNicknameChange = (nextNickname) => {
 
         </div>
       </div>
+
       )}
 
       {/* 에러 토스트 */}
       {error && <div className="wt-error" role="alert">{error}</div>}
 
       {/* 완료 유닛 클릭 시 결과 모달 */}
+
       {resultModal && (
         <UnitResultModal
           unitId={resultModal.unitId}
