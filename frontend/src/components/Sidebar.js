@@ -10,24 +10,28 @@ import AddExpModal from "./AddExpModal";
 const Sidebar = () => {
   // 페이지 이동(Routing)을 위한 함수
   const navigate = useNavigate();
-  
+
   // 팝업창(Modal)의 열림/닫힘 상태(State)를 관리하는 변수
   const [showTimeTravelModal, setShowTimeTravelModal] = useState(false);
   const [showAddExpModal, setShowAddExpModal] = useState(false);
-  
+
   // LocalStorage에서 현재 로그인한 사용자의 이메일을 가져옴 (데이터가 없으면 빈 문자열 할당)
   const email = localStorage.getItem("email") || "";
 
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">Word Tower</div>
-      
+
       {/* 클릭 시 메인 대시보드 화면으로 이동하는 Button */}
-      <button className="sidebar-button" onClick={() => navigate("/user")}>대시보드</button>
+      <button className="sidebar-button" onClick={() => navigate("/user")}>
+        대시보드
+      </button>
       <button className="sidebar-button">설정</button>
       <button className="sidebar-button">나의 단어장</button>
       <button className="sidebar-button">복습하기</button>
-      <button className="sidebar-button">내 프로필</button>
+      <button className="sidebar-button" onClick={() => navigate("/profile")}>
+        내 프로필
+      </button>
 
       {/* 조건부 렌더링(Conditional Rendering): 
         사용자의 이메일이 테스트 계정일 때만 아래의 코드 블록을 화면에 그림 

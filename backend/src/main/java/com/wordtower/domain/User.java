@@ -23,10 +23,7 @@ public class User {
     private String nickname;
 
     private int difficulty = 1;
-
-    // 💡 [필수 추가] 변수(필드)가 먼저 선언되어 있어야 에러가 안 납니다!
-    @Column(nullable = false, columnDefinition = "int default 0")
-    private int exp = 0; 
+ 
 
     private int currentStreak = 0;
     private int longestStreak = 0;
