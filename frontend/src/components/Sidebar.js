@@ -7,7 +7,11 @@ import AddExpModal from "./AddExpModal";
  * 화면 좌측의 메뉴 네비게이션을 담당하는 UI Component
  * 특정 테스트 계정으로 접속 시 타임 트래블 및 EXP 테스트 기능이 활성화
  */
-const Sidebar = ({ activeView = "dashboard", onDashboardClick, onProfileClick }) => {
+const Sidebar = ({
+  activeView = "dashboard",
+  onDashboardClick,
+  onProfileClick,
+}) => {
   // 페이지 이동(Routing)을 위한 함수
   const navigate = useNavigate();
 
@@ -23,27 +27,19 @@ const Sidebar = ({ activeView = "dashboard", onDashboardClick, onProfileClick })
       <div className="sidebar-logo">Word Tower</div>
 
       {/* 클릭 시 메인 대시보드 화면으로 이동하는 Button */}
-<<<<<<< HEAD
-      <button className="sidebar-button" onClick={() => navigate("/user")}>
-=======
       <button
         className={`sidebar-button ${activeView === "dashboard" ? "active" : ""}`}
         onClick={onDashboardClick || (() => navigate("/user"))}
       >
->>>>>>> origin/develop
         대시보드
       </button>
       <button className="sidebar-button">설정</button>
       <button className="sidebar-button">나의 단어장</button>
       <button className="sidebar-button">복습하기</button>
-<<<<<<< HEAD
-      <button className="sidebar-button" onClick={() => navigate("/profile")}>
-=======
       <button
         className={`sidebar-button ${activeView === "profile" ? "active" : ""}`}
         onClick={onProfileClick}
       >
->>>>>>> origin/develop
         내 프로필
       </button>
 
