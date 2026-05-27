@@ -34,6 +34,22 @@ public class UserService {
     }
 
     /**
+     * 레벨테스트 통과 시 다음 티어의 첫 유닛을 엽니다.
+     */
+    @Transactional
+    public int passLevelTest(Long userId, int tier) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        int nextTierUnit = tier * 5 + 1;
+        if (user.getUnlockedUnits() < nextTierUnit) {
+            user.setUnlockedUnits(nextTierUnit);
+            userRepository.save(user);
+        }
+        return user.getUnlockedUnits();
+    }
+
+    /**
      * 사용자의 마지막 학습일(lastActivityDate)을 문자열로 조회
      */
     public String getLastActivityDate(Long userId) {
