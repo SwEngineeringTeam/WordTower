@@ -50,6 +50,15 @@ public class UserController {
     }
 
     /**
+     * 레벨테스트 통과 후 다음 티어를 엽니다.
+     */
+    @PostMapping("/{userId}/level-test/pass")
+    public ResponseEntity<Integer> passLevelTest(@PathVariable Long userId,
+                                                 @RequestParam(defaultValue = "1") int tier) {
+        return ResponseEntity.ok(userService.passLevelTest(userId, tier));
+    }
+
+    /**
      * 사용자의 스트릭 방어권 보유 개수 조회
      */
     @GetMapping("/{userId}/streak-freeze")

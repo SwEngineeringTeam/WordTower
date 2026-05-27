@@ -61,8 +61,10 @@ public class QuizController {
         // 1. 스트릭 갱신
         streakService.updateUserStreak(userId, true);
 
-        // 2. 다음 유닛 열기
-        userService.unlockNextUnit(userId, completedUnit);
+        // 2. 티어 마지막 유닛은 레벨테스트 통과 후 다음 티어를 엽니다.
+        if (completedUnit % 5 != 0) {
+            userService.unlockNextUnit(userId, completedUnit);
+        }
 
         // 3. QuizRecord 저장
         User user = userRepository.findById(userId)

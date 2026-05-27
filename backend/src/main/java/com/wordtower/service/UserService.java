@@ -35,7 +35,27 @@ public class UserService {
     }
 
     /**
+<<<<<<< HEAD
      * 회원가입 및 초기 층 설정 로직 (PBI-17 온보딩)
+=======
+     * 레벨테스트 통과 시 다음 티어의 첫 유닛을 엽니다.
+     */
+    @Transactional
+    public int passLevelTest(Long userId, int tier) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        int nextTierUnit = tier * 5 + 1;
+        if (user.getUnlockedUnits() < nextTierUnit) {
+            user.setUnlockedUnits(nextTierUnit);
+            userRepository.save(user);
+        }
+        return user.getUnlockedUnits();
+    }
+
+    /**
+     * 사용자의 마지막 학습일(lastActivityDate)을 문자열로 조회
+>>>>>>> origin/develop
      */
     @Transactional // 쓰기 작업이므로 readOnly 해제
     public void register(RegisterRequest request) {

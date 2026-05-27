@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Homepage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import UserMainPage from "./pages/UserMainPage";
-// import QuizPage from "./pages/QuizPage";
+import LevelTestPage from "./pages/LevelTestPage";
 import RegisterPage from "./pages/RegisterPage";
 import MiniGamePage from "./pages/MiniGamePage"; // ✅ 추가
 
@@ -13,7 +13,6 @@ import WordManager from "./components/WordManager";
 import MemoryCard from "./components/MemoryCard";
 import DailyQuiz from "./components/DailyQuiz";
 import WrongWordReviewPage from "./pages/WrongWordReviewPage"; // ← 추가
-import UserProfile from "./pages/UserProfile";
 
 function App() {
   return (
@@ -29,7 +28,7 @@ function App() {
         {/* 3. 일반 유저 메인 대시보드 */}
         <Route path="/user" element={<UserMainPage />} />
         <Route path="/quiz/:unitId" element={<DailyQuiz />} />
-        <Route path="/profile" element={<UserProfile />} />
+        <Route path="/level-test/:tier" element={<LevelTestPage />} />
 
         {/* 4. 관리자 페이지 */}
         <Route path="/admin" element={<WordManager />} />
