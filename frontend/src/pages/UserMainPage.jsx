@@ -127,8 +127,8 @@ const UserMainPage = () => {
               disabled={locked}
             >
               <span>Unit {unitNum}</span>
-              <strong>{locked ? "LOCKED" : isCompleted ? "DONE" : "PLAY"}</strong>
-              {locked && <span className="lock-icon">LOCK</span>}
+              <strong>{locked ? "LOCKED" : isCompleted ? "✅ DONE" : "PLAY"}</strong>
+              {locked && <span className="lock-icon">🔒</span>}
             </button>
           );
         })}
@@ -166,7 +166,7 @@ const UserMainPage = () => {
 
               <section className="tower-area">
                 <div className="tower-skyline">
-                  <div className="crane-icon">Tower</div>
+                  <div className="crane-icon">🏗️</div>
                   <div className="blueprint-label">Tower Construction</div>
                 </div>
 
@@ -185,7 +185,7 @@ const UserMainPage = () => {
                           onClick={() => navigate(`/level-test/${currentTier}`)}
                           title="레벨테스트 시작"
                         >
-                          <span className="btn-icon">TEST</span>
+                          <span className="btn-icon">🚀</span>
                           <span className="btn-label">Level Test</span>
                         </button>
                       ) : (
@@ -195,7 +195,13 @@ const UserMainPage = () => {
                             onClick={() => navigate(`/memory-card?unitId=${unlockedUnits}`)}
                             title={isStudyDone ? "완료! 다시 학습할 수 있어요" : "단어 암기 학습 시작"}
                           >
-                            <span className="btn-icon">{isStudyDone ? "OK" : "STUDY"}</span>
+                            <span className="btn-icon">
+                              {isStudyDone ? (
+                                <span style={{ fontSize: "18px", color: "#fff", fontWeight: "bold" }}>✔</span>
+                              ) : (
+                                "📖"
+                              )}
+                            </span>
                             <span className="btn-label">단어 학습</span>
                             {isStudyDone && <span className="done-badge">완료</span>}
                           </button>
@@ -205,7 +211,13 @@ const UserMainPage = () => {
                             onClick={() => navigate(`/quiz/${unlockedUnits}`)}
                             title={isQuizDone ? "완료! 다시 풀 수 있어요" : "퀴즈 풀기"}
                           >
-                            <span className="btn-icon">{isQuizDone ? "OK" : "QUIZ"}</span>
+                            <span className="btn-icon">
+                              {isQuizDone ? (
+                                <span style={{ fontSize: "18px", color: "#fff", fontWeight: "bold" }}>✔</span>
+                              ) : (
+                                "📝"
+                              )}
+                            </span>
                             <span className="btn-label">퀴즈</span>
                             {isQuizDone && <span className="done-badge">완료</span>}
                           </button>
@@ -215,7 +227,7 @@ const UserMainPage = () => {
                             onClick={() => navigate(`/mini-game?unitId=${unlockedUnits}`)}
                             title="언제든지 즐길 수 있는 미니게임"
                           >
-                            <span className="btn-icon">GAME</span>
+                            <span className="btn-icon">🎮</span>
                             <span className="btn-label">미니게임</span>
                             <span className="always-on-badge">Always ON</span>
                           </button>
