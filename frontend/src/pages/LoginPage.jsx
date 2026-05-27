@@ -12,6 +12,11 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const user_data = await login(email, password);
+      if (user_data.streakMessage) {
+        window.alert(user_data.streakMessage);
+      }
+      // 로그인 성공 시 백엔드가 최신 스트릭, 방어권, 마지막 활동일을 반환하고
+      // authService가 해당 값을 localStorage에 동기화합니다.
       if (user_data.role === "ADMIN") {
         navigate("/admin");
       } else {
