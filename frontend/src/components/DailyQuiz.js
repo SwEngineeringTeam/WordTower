@@ -1,8 +1,10 @@
+// 수정 후
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { submitQuizAndUpdateStreak } from "../services/streakService";
 
 const themeColor = '#29B6F6';
+
 
 // ── API ──────────────────────────────────────────────────────────────────────
 
@@ -169,8 +171,6 @@ function ResultScreen({ results, quizWords, onRetry, onHome }) {
           </div>
         ))}
       </div>
-
-      {/* 버튼 */}
       <div style={{ display: 'flex', gap: '10px', width: '100%', maxWidth: '560px', paddingBottom: '2rem' }}>
         <button
             onClick={onHome}
@@ -178,24 +178,22 @@ function ResultScreen({ results, quizWords, onRetry, onHome }) {
         >
             홈으로
         </button>
-
-        <button
-            onClick={onRetry}
-            style={{ ...S.btnPrimary, flex: 3 }}
-        >
-            다시 풀기
-        </button>
-    </div>
+      </div>
     </div>
   );
 }
 
 // ── 메인 퀴즈 컴포넌트 ───────────────────────────────────────────────────────
 
+// 수정 후
 export default function DailyQuiz() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { unitId } = useParams();
+  const { unitId: paramUnitId } = useParams();
+
+  // ✅ useParams 또는 쿼리스트링 둘 다 지원
+  const queryUnitId = new URLSearchParams(location.search).get("unitId");
+  const unitId = paramUnitId || queryUnitId || "1";
 
   const userId = localStorage.getItem("userId") || "1";
   const todayWords = location.state?.words ?? [];
@@ -212,13 +210,56 @@ export default function DailyQuiz() {
 
   const inputRef = useRef(null);
 
-  // 퀴즈 단어 로딩 (오늘 단어 + 오답 5개)
-  const loadQuiz = (baseWords) => {
-    fetchWrongWords(5)
-      .then((wrongWords) => setQuizWords(shuffle([...baseWords, ...wrongWords])))
-      .catch(()          => setQuizWords(shuffle([...baseWords])))
-      .finally(()        => setLoading(false));
-  };
+// DailyQuiz.js - loadQuiz 부분 수정
+
+  // 수정 후
+const loadQuiz = (baseWords) => {
+
+  const fetchBase = baseWords.length > 0
+    ? Promise.resolve(baseWords)
+    : fetch(`/api/words/unit?unitId=${unitId}&limit=10&t=${Date.now()}`)
+        .then(r => r.json())
+        .then(d => Array.isArray(d) ? d : []);
+
+  fetchBase
+    .then(base => {
+      const baseIds = new Set(base.map(w => w.id));
+
+      return fetchWrongWords(5)
+        .then(wrongWords => {
+          // 중복 제거 (base에 이미 있는 단어는 제외)
+          const filtered = wrongWords.filter(w => !baseIds.has(w.id));
+          const needed = 5 - filtered.length;
+
+          if (needed <= 0) {
+            // ✅ 오답 5개 충분한 경우
+            return setQuizWords(shuffle([...base, ...filtered.slice(0, 5)]));
+          }
+
+          return fetch(`/api/words/daily?unitId=${unitId}&limit=${needed * 3}&t=${Date.now()}`)
+            .then(r => r.json())
+            .then(d => Array.isArray(d) ? d : [])
+            .then(extra => {
+              // base랑 이미 뽑은 오답과 중복 제거
+              const allIds = new Set([...baseIds, ...filtered.map(w => w.id)]);
+              const extraFiltered = extra.filter(w => !allIds.has(w.id)).slice(0, needed);
+              return setQuizWords(shuffle([...base, ...filtered, ...extraFiltered]));
+            });
+        })
+        .catch(() => {
+          // fetchWrongWords 자체가 실패한 경우 랜덤으로 채우기
+          return fetch(`/api/words/daily?unitId=${unitId}&limit=15&t=${Date.now()}`)
+            .then(r => r.json())
+            .then(d => Array.isArray(d) ? d : [])
+            .then(extra => {
+              const extraFiltered = extra.filter(w => !baseIds.has(w.id)).slice(0, 5);
+              return setQuizWords(shuffle([...base, ...extraFiltered]));
+            });
+        });
+    })
+    .finally(() => setLoading(false));
+
+};
 
   useEffect(() => { loadQuiz(todayWords); }, []); // eslint-disable-line
 
@@ -231,7 +272,7 @@ export default function DailyQuiz() {
     setCurrent(0); setInput(''); setSubmitted(false);
     setIsCorrect(null); setResults([]); setShowResult(false);
     setLoading(true);
-    loadQuiz(todayWords);
+    loadQuiz(todayWords);  // todayWords 없으면 API에서 다시 fetch
   };
 
   if (loading) return <div style={S.center}>퀴즈를 준비하는 중...</div>;
@@ -261,6 +302,11 @@ export default function DailyQuiz() {
       saveWrongWord(q).catch(() => {});
     } else if (q.id) {
       deleteWrongWord(q.id).catch(() => {});
+      // 맞힌 단어를 다음 퀴즈 로딩 시 제외하기 위해 로컬에 기록
+      const solved = JSON.parse(localStorage.getItem("solvedWrongIds") || "[]");
+      if (!solved.includes(q.id)) {
+        localStorage.setItem("solvedWrongIds", JSON.stringify([...solved, q.id]));
+      }
     }
   };
 
@@ -287,9 +333,44 @@ export default function DailyQuiz() {
     const currentLocalStreak = Number(localStorage.getItem("streak")) || 0;
     localStorage.setItem("streak", String(currentLocalStreak + 1));
 
+    // ✅ 추가: UnitResultModal에서 사용할 퀴즈 결과 저장
+    const total = quizWords.length;
+    const correct = results.filter(r => r.correct).length;
+    const wrongWordList = results
+      .filter(r => !r.correct)
+      .map(r => ({ english: r.word, korean: r.meaning }));
+    localStorage.setItem(`quizResult_unit_${unitId}`, JSON.stringify({ total, correct }));
+    localStorage.setItem(`wrongWords_unit_${unitId}`, JSON.stringify(wrongWordList));
+    
     try {
-      const result = await submitQuizAndUpdateStreak(Number(userId), Number(unitId));
+      const total = quizWords.length;
+      // ✅ 수정: results에 이미 마지막 문제까지 포함되어 있으므로 isCorrect 따로 더하지 않음
+      const correct = results.filter(r => r.correct).length;
+
+      // ✅ 수정: details도 results에서만 생성 — 마지막 문제 수동 추가 블록 삭제
+      const details = results.map(r => ({
+        spelling: r.word,
+        userAnswer: r.userAnswer,
+        isCorrect: r.correct,
+        meaning: r.meaning  // ✅ 추가
+      }));
+      
+
+      const result = await submitQuizAndUpdateStreak(Number(userId), Number(unitId), total, correct, details);
       console.log("퀴즈 완료 → unit/streak 갱신 성공:", result);
+
+      // ✅ 퀴즈 완료 시에만 완료 상태 저장
+      const parsedUserId = Number(userId);
+      if (!isNaN(parsedUserId) && parsedUserId > 0) {
+        await fetch(
+          `http://localhost:8080/api/progress/${parsedUserId}/unit/${unitId}/done`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: "quiz" })
+          }
+        );
+      }
     } catch (error) {
       console.error("백엔드 갱신 실패. 프론트에는 임시 반영됨:", error);
     }

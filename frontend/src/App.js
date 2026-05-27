@@ -4,12 +4,19 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Homepage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import UserMainPage from "./pages/UserMainPage";
+<<<<<<< HEAD
 import QuizPage from "./pages/QuizPage";
 import RegisterPage from "./pages/RegisterPage";
+=======
+import MiniGamePage from "./pages/MiniGamePage"; // ✅ 추가
+
+>>>>>>> origin/develop
 // 기존 관리자 컴포넌트
 import WordManager from "./components/WordManager";
 import MemoryCard from "./components/MemoryCard";
 import DailyQuiz from "./components/DailyQuiz";
+import WrongWordReviewPage from "./pages/WrongWordReviewPage"; // ← 추가
+
 
 function App() {
   return (
@@ -29,6 +36,8 @@ function App() {
         {/* 4. 관리자 페이지 */}
         <Route path="/admin" element={<WordManager />} />
         <Route path="/memory-card" element={<MemoryCard />} />
+        <Route path="/wrong-word-review" element={<WrongWordReviewPage />} /> 
+        <Route path="/mini-game" element={<MiniGamePage />} />
       </Routes>
     </Router>
   );

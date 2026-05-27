@@ -27,8 +27,12 @@ public class WordService {
     public List<Word> findAll() {
         return wordRepository.findAll();
     }
-    public List<Word> findRandomByDifficulty(String difficulty, int limit) {
-        return wordRepository.findRandomWordsByDifficulty(difficulty, limit);
+    public List<Word> findRandomByDifficulty(String unitId, int limit) {
+        int unit = Integer.parseInt(unitId);
+        int difficultyNum = (unit - 1) / 5;          // unit 1~5 → 0, unit 6~10 → 1
+        int offset = ((unit - 1) % 5) * limit;        // 0, 10, 20, 30, 40
+        String difficulty = String.valueOf(difficultyNum); // int → String 변환
+        return wordRepository.findWordsByDifficultyOrdered(difficulty, limit, offset);
     }
     public List<Word> findWrongWords(int limit) {
     List<UserWord> wrongWords = userWordRepository.findWrongWords(limit);
@@ -44,18 +48,10 @@ public class WordService {
                 })
                 .collect(Collectors.toList());
     }
-    // [여기에 추가!] 오늘의 단어 10개를 무작위로 가져오는 로직
-    public List<Word> findDailyWords(int limit) {
-        // 1. DB에서 모든 단어를 일단 가져옵니다.
-        List<Word> allWords = wordRepository.findAll();
-        
-        // 2. 무작위로 섞습니다.
-        java.util.Collections.shuffle(allWords);
-        
-        // 3. 요청한 개수(limit)만큼만 잘라서 반환합니다.
-        return allWords.stream()
-                .limit(limit)
-                .collect(java.util.stream.Collectors.toList());
+    public List<Word> findWordsByUnit(int unitId, int limit) {
+        int startId = (unitId - 1) * 10 + 1;  // unit1=1, unit2=11, unit3=21...
+        int endId = unitId * 10;               // unit1=10, unit2=20, unit3=30...
+        return wordRepository.findWordsByUnitId(startId, endId, limit);
     }
 
     @Transactional
@@ -96,5 +92,9 @@ public class WordService {
         userWord.setWrongCount(userWord.getWrongCount() + 1);
 
         return userWordRepository.save(userWord);
+    }
+    @Transactional
+    public void deleteWrongWord(Long wordId) {
+        // wordId에 해당하는 오답 기록 삭제 또는 오답 상태 해제 로직
     }
 }

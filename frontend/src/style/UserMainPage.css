@@ -1,25 +1,28 @@
+/* --- 전체 페이지 배경 및 기본 폰트 설정 --- */
 .user-main-page {
-  min-height: 100vh;
+  min-height: 100vh; /* 화면 전체 높이를 최소 높이로 지정 */
   background: linear-gradient(180deg, #bce0fd 0%, #eef8ff 100%);
   font-family: "Noto Sans KR", "Arial", sans-serif;
 }
 
+/* --- 대시보드 메인 레이아웃 (Sidebar와 메인 콘텐츠를 좌우로 배치) --- */
 .dashboard-shell {
-  display: flex;
+  display: flex; /* Flexbox를 사용한 가로 배치 */
   gap: 24px;
   padding: 32px;
   max-width: 1400px;
-  margin: 0 auto;
+  margin: 0 auto; /* 좌우 여백을 동일하게 주어 중앙 정렬 */
 }
 
+/* --- 좌측 네비게이션 메뉴 (Sidebar) --- */
 .sidebar {
   width: 220px;
   padding: 24px;
   border-radius: 28px;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.92); /* 반투명 하얀색 배경 */
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08); /* 부드러운 그림자 효과 */
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* 내부 요소들을 세로 방향으로 정렬 */
   gap: 14px;
 }
 
@@ -37,29 +40,31 @@
   color: #1e293b;
   cursor: pointer;
   text-align: left;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease; /* Hover 시 색상 변경을 부드럽게 처리 */
 }
 
 .sidebar-button:hover {
   background: #e2e8f0;
 }
 
+/* --- 우측 메인 패널 (상태바와 타워 영역을 포함) --- */
 .main-panel {
-  flex: 1;
+  flex: 1; /* Sidebar가 차지하고 남은 나머지 공간을 모두 차지하도록 설정 */
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* 내부 세션들을 세로로 배치 */
   gap: 24px;
 }
 
+/* --- 상단 상태바 영역 (TopStatusBoard) --- */
 .top-status {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* Card들을 양쪽 끝으로 밀어내며 배치 */
   gap: 24px;
 }
 
 .streak-card,
 .welcome-card {
-  flex: 1;
+  flex: 1; /* 두 개의 카드가 1:1 비율로 너비를 나눠 가짐 */
   padding: 24px;
   border-radius: 28px;
   background: rgba(255, 255, 255, 0.95);
@@ -68,7 +73,7 @@
 
 .streak-card {
   display: flex;
-  align-items: center;
+  align-items: center; /* 수직 중앙 정렬 */
   gap: 18px;
 }
 
@@ -79,6 +84,28 @@
 .status-label {
   margin: 0 0 4px;
   color: #475569;
+}
+
+/* 스트릭 방어권 표시 영역 */
+.streak-freeze-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto; /* 동일한 Flex Container 내에서 이 요소만 맨 우측으로 밀어냄 */
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: rgba(200, 230, 255, 0.5);
+  border: 1.5px solid #7dd3fc;
+}
+
+.freeze-icon {
+  font-size: 1.3rem;
+}
+
+.freeze-count {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #0369a1;
 }
 
 .welcome-card p {
@@ -94,6 +121,7 @@
   line-height: 1.4;
 }
 
+/* --- 메인 학습 타워 레이아웃 영역 --- */
 .tower-area {
   padding: 24px;
   border-radius: 32px;
@@ -114,6 +142,7 @@
   font-size: 0.95rem;
 }
 
+/* 현재 진행 중인 층(Tier) 표시 보드 */
 .tower-board {
   padding: 28px;
   border-radius: 28px;
@@ -126,13 +155,39 @@
   margin-bottom: 18px;
 }
 
+/* 유닛들을 담는 Grid Container (1줄에 5개 배치) */
 .unit-row {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  /* 핵심: 각 카드가 최소 110px의 너비를 유지하도록 강제 */
+  grid-template-columns: repeat(5, minmax(110px, 1fr));
   gap: 16px;
   margin-bottom: 24px;
+  
+  /* 화면이 카드 5개의 총 너비보다 좁아지면 가로 스크롤을 생성 */
+  overflow-x: auto; 
+
+  /* 카드가 떠오를 공간을 확보하기 위해 상단 패딩 추가 */
+  padding-top: 8px; 
+  /* 패딩을 추가한 만큼 기존 레이아웃이 미세하게 내려가는 것을 방지 */
+  margin-top: -8px;
+  
+  /* 스크롤바가 카드 디자인을 가리지 않도록 하단 여백을 줌 */
+  padding-bottom: 12px; 
+  
+  /* 모바일에서 스와이프할 때 카드가 화면 중앙이나 끝에 자석처럼 붙게 하는 UX 설정 */
+  scroll-snap-type: x mandatory;
 }
 
+/* 스크롤바 디자인 숨김 처리 (웹앱처럼 깔끔하게 보이게 함) */
+.unit-row::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge 등에서 스크롤바 숨김 */
+}
+.unit-row {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* 개별 유닛 Card 스타일 (기존 코드에서 scroll-snap-align만 추가) */
 .unit-card {
   padding: 22px 16px;
   border-radius: 22px;
@@ -145,22 +200,28 @@
   min-height: 130px;
   cursor: pointer;
   transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  
+  /* 가로 스크롤 시 카드가 뷰포트의 시작점에 맞춰지도록 정렬 */
+  scroll-snap-align: start; 
 }
 
+/* 열린(진행 가능한) 유닛 스타일 */
 .unit-card.unlocked {
   background: #ffffff;
   border-color: #4f46e5;
 }
 
+/* 잠긴 유닛 스타일 */
 .unit-card.locked {
   background: #f1f5f9;
   border-color: #cbd5e1;
   color: #94a3b8;
-  cursor: not-allowed;
+  cursor: not-allowed; /* 클릭 불가 상태 마우스 커서 */
 }
 
+/* Hover 시 살짝 위로 떠오르는 애니메이션 */
 .unit-card.unlocked:hover {
-  transform: translateY(-4px);
+  transform: translateY(-4px); 
 }
 
 .unit-card strong {
@@ -173,6 +234,7 @@
   font-size: 1.1rem;
 }
 
+/* 현재 유닛 학습 시작 버튼 및 패널 */
 .action-panel {
   display: flex;
   align-items: center;
@@ -191,13 +253,105 @@
 
 .primary-action {
   padding: 16px 28px;
-  border-radius: 999px;
-  border: none;
-  background: #2563eb;
-  color: white;
-  cursor: pointer;
+  border-radius: 999px; 
+}
+.action-buttons {
+  display: flex;
+  gap: 12px;
 }
 
+.action-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 18px 24px;
+  border: none;
+  border-radius: 16px;
+  /* 사진처럼 완전 둥글게 */
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  min-width: 110px;
+}
+
+.action-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+}
+
+.action-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.btn-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+/* 사진처럼 하늘색 계열 */
+.study-btn {
+  background:#79c7f1;
+}
+
+.quiz-btn {
+  background: #26C6DA;
+}
+
+.mini-game-btn {
+  background:  #1976D2;
+}
+
+/* 완료 상태 - 초록색으로 바꿔서 티나게 */
+.action-btn.done {
+  background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
+}
+
+.action-btn.done:hover {
+  background: linear-gradient(135deg, #16a34a, #15803d) !important;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(34, 197, 94, 0.45);
+}
+
+.action-btn.done .btn-label {
+  color: #ffffff;
+}
+
+/* 배지 */
+.done-badge,
+.always-on-badge {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 20px;
+}
+
+.done-badge {
+  background: rgba(0, 0, 0, 0.2);
+  color: #eceff1;
+}
+
+.always-on-badge {
+  background: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+
+/* --- 완료된 이전 층 리스트 영역 --- */
 .done-panel {
   margin-top: 20px;
 }
@@ -210,7 +364,7 @@
 .done-list {
   display: flex;
   gap: 12px;
-  flex-wrap: wrap;
+  flex-wrap: wrap; /* 공간이 부족하면 다음 줄로 넘김 */
 }
 
 .done-node {
@@ -221,6 +375,7 @@
   font-weight: 700;
 }
 
+/* --- 하단 안내 문구 영역 --- */
 .bottom-notice {
   padding: 20px 24px;
   border-radius: 24px;
@@ -233,13 +388,13 @@
   margin-bottom: 12px;
 }
 
-/* --- 완료된 이전 층 드롭다운 스타일 --- */
+/* --- 완료된 이전 층 드롭다운 스타일 (Toggle) --- */
 .completed-tier-group {
   margin-bottom: 12px;
   border-radius: 12px;
   background-color: #f8fafc;
   border: 1px solid #e2e8f0;
-  overflow: hidden;
+  overflow: hidden; /* 내부 요소가 테두리를 넘어가지 않도록 숨김 */
 }
 
 .tier-dropdown-btn {
@@ -261,16 +416,18 @@
   background-color: #e2e8f0;
 }
 
+/* 드롭다운이 열릴 때 부드럽게 나타나는 애니메이션 클래스 */
 .tier-dropdown-content {
   padding: 20px;
   background-color: white;
-  animation: slideDown 0.3s ease-out forwards;
+  animation: slideDown 0.3s ease-out forwards; /* slideDown Keyframe 실행 */
 }
 
+/* 드롭다운 애니메이션 Keyframes 설정 */
 @keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-10px); /* 위에서 아래로 내려오는 효과 */
   }
   to {
     opacity: 1;

@@ -32,7 +32,15 @@ public class User {
     private int longestStreak = 0;
     private LocalDateTime lastActivityDate;
 
-    // [추가] 사용자가 현재 열어둔 유닛 (기본값: 1)
+    // 스트릭 방어권 보유 개수
+    @Column(nullable = false, columnDefinition = "int default 0")
+    private int streakFreezeCount = 0;
+
+    // 사용자의 현재 누적 경험치
+    @Column(nullable = false, columnDefinition = "int default 0")
+    private int exp = 0;
+
+    // 사용자가 현재 열어둔 유닛 (기본값: 1)
     @Column(nullable = false, columnDefinition = "int default 1")
     private int unlockedUnits = 1; 
 
