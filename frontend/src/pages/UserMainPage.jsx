@@ -11,6 +11,8 @@ import AddExpModal from "../components/AddExpModal";
    픽셀 UI 서브 컴포넌트
 ══════════════════════════════════════ */
 
+import UserProfile from "./UserProfile";
+
 /**
  * BrickWall — 교차 줄눈 벽돌을 JSX div로 렌더링
  */
@@ -109,7 +111,10 @@ const Lamp = () => {
  */
 const UserMainPage = () => {
   const navigate = useNavigate();
-  const userId   = localStorage.getItem("userId");
+
+  const userId = localStorage.getItem("userId");
+  const userEmail = localStorage.getItem("email") || "";
+  const [nickname, setNickname] = useState(localStorage.getItem("nickname") || "Tower Learner");
 
   // ── 상태 (최신 코드 그대로) ──
   const [streak,           setStreak]           = useState(0);
@@ -125,7 +130,6 @@ const UserMainPage = () => {
   const [resultModal,      setResultModal]       = useState(null);
   const [showTimeTravelModal, setShowTimeTravelModal] = useState(false); // ← 추가
   const [showAddExpModal,     setShowAddExpModal]     = useState(false); // ← 추가
-
   // ── 픽셀 UI 전용 상태 ──
   const [activeTab,  setActiveTab]  = useState("dashboard");
   const [activeTier, setActiveTier] = useState(
@@ -197,13 +201,18 @@ const UserMainPage = () => {
       setActiveTier(tier);
     }
   };
+  const currentTier = Math.ceil(unlockedUnits / 5) || 1;
 
-  const currentTier    = Math.ceil(unlockedUnits / 5) || 1;
-  const getUnitStatus  = (unitNum) => {
-    if (unitNum < unlockedUnits)   return "done";
-    if (unitNum === unlockedUnits) return "current";
-    return "locked";
-  };
+const getUnitStatus = (unitNum) => {
+  if (unitNum < unlockedUnits) return "done";
+  if (unitNum === unlockedUnits) return "current";
+  return "locked";
+};
+
+const handleNicknameChange = (nextNickname) => {
+  localStorage.setItem("nickname", nextNickname);
+  setNickname(nextNickname);
+};
 
   /** 픽셀 UI용 유닛 버튼 렌더링 */
   const renderTierUnits = (tier) => {
@@ -289,15 +298,17 @@ const UserMainPage = () => {
         </div>
       </header>
 
-      {/* ══ 프로필 탭 ══ */}
       {activeTab === "profile" ? (
         <div className="profile-wrap">
-          {/* 기존 UserProfile 컴포넌트 연결 시 여기에 추가 */}
-          <p style={{ color: "#fff", textAlign: "center", marginTop: 40 }}>
-            프로필 페이지
-          </p>
+          <UserProfile
+            nickname={nickname}
+            userEmail={userEmail}
+            streak={streak}
+            currentTier={currentTier}
+            unlockedUnits={unlockedUnits}
+            onNicknameChange={handleNicknameChange}
+          />
         </div>
-
       ) : (
 
       /* ══ 게임 씬 ══ */
@@ -451,7 +462,7 @@ const UserMainPage = () => {
       {/* 에러 토스트 */}
       {error && <div className="wt-error" role="alert">{error}</div>}
 
-      {/* 완료 유닛 클릭 시 결과 모달 (최신 코드 그대로) */}
+      {/* 완료 유닛 클릭 시 결과 모달 */}
       {resultModal && (
         <UnitResultModal
           unitId={resultModal.unitId}
@@ -459,9 +470,9 @@ const UserMainPage = () => {
           onClose={() => setResultModal(null)}
         />
       )}
-
     </div>
   );
 };
 
 export default UserMainPage;
+
