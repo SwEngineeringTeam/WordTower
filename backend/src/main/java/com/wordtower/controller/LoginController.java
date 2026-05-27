@@ -5,11 +5,7 @@ import com.wordtower.dto.LoginRequest;
 import com.wordtower.dto.LoginResponse; 
 import com.wordtower.repository.UserRepository; // 💡 DB 조회를 위해 임포트 추가
 import lombok.RequiredArgsConstructor; // 💡 생성자 주입을 위해 추가
-import com.wordtower.dto.LoginRequest;
-import com.wordtower.dto.LoginResponse;
-import com.wordtower.repository.UserRepository;
 import com.wordtower.service.StreakService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
