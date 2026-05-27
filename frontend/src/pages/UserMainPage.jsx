@@ -134,8 +134,8 @@ const UserMainPage = () => {
   // ── 픽셀 UI 전용 상태 ──
   const [activeTab,  setActiveTab]  = useState("dashboard");
   const [activeTier, setActiveTier] = useState(
-    parseInt(localStorage.getItem("activeTier")) || 1
-  );
+  parseInt(localStorage.getItem("activeTier")) || Math.ceil((parseInt(localStorage.getItem("unlockedUnits")) || 1) / 5) || 1
+);
 
   const TOTAL_TIERS = 3;
 
