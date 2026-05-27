@@ -357,10 +357,10 @@ const loadQuiz = (baseWords) => {
       const result = await submitQuizAndUpdateStreak(Number(userId), Number(unitId), total, correct, details);
       console.log("퀴즈 완료 → unit/streak 갱신 성공:", result);
 
-      if (correct > 0) {
+      if (result?.streakIncreased) {
         localStorage.setItem("streak", String(nextStreak));
         localStorage.setItem("currentStreak", String(nextStreak));
-        window.alert(`축하합니다! 오늘 퀴즈를 완료해 스트릭이 ${previousStreak}일에서 ${nextStreak}일로 증가 했습니다!`);
+        window.alert(`축하합니다! 오늘 퀴즈를 완료해 스트릭을 ${previousStreak}일에서 ${nextStreak}일로 증가시켰습니다!`);
       }
 
       const parsedUserId = Number(userId);

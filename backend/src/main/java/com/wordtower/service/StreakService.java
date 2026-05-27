@@ -79,9 +79,9 @@ public class StreakService {
      * @param quizCompleted 퀴즈 완료 여부
      */
     @Transactional
-    public void updateUserStreak(Long userId, boolean quizCompleted) {
+    public boolean updateUserStreak(Long userId, boolean quizCompleted) {
         if (!quizCompleted) {
-            return;
+            return false;
         }
 
         User user = userRepository.findById(userId)
@@ -95,9 +95,10 @@ public class StreakService {
                 : null;
 
         if (lastActivity != null && lastActivity.equals(today)) {
-            return;
+            return false;
         }
 
+        int oldStreak = user.getCurrentStreak();
         int newCurrentStreak;
         if (lastActivity == null) {
             newCurrentStreak = 1;
@@ -123,6 +124,7 @@ public class StreakService {
         user.setLastActivityDate(nowKst.toLocalDateTime());
         user.setStreakCheckDate(null);
         userRepository.save(user);
+        return newCurrentStreak > oldStreak;
     }
 
     /**

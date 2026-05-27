@@ -14,7 +14,9 @@ import lombok.Setter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/quiz")
@@ -53,14 +55,15 @@ public class QuizController {
      * 퀴즈 제출 시 스트릭 갱신 + 유닛 진도 + QuizRecord + QuizDetail 저장
      */
     @PostMapping("/submit")
-    public ResponseEntity<String> submitQuiz(@RequestBody QuizSubmitRequest request) {
+    public ResponseEntity<Map<String, Object>> submitQuiz(@RequestBody QuizSubmitRequest request) {
 
         Long userId = request.getUserId();
         int completedUnit = request.getCompletedUnit();
 
         // 정답이 하나 이상인 경우에만 스트릭을 증가시킵니다.
+        boolean streakIncreased = false;
         if (request.getCorrectCount() > 0) {
-            streakService.updateUserStreak(userId, true);
+            streakIncreased = streakService.updateUserStreak(userId, true);
         }
         
 
@@ -100,6 +103,9 @@ public class QuizController {
             }
         }
 
-        return ResponseEntity.ok("Quiz submitted!");
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("message", "Quiz submitted!");
+        resp.put("streakIncreased", streakIncreased);
+        return ResponseEntity.ok(resp);
     }
 }
