@@ -150,10 +150,9 @@ const UserMainPage = () => {
   const [showAddExpModal, setShowAddExpModal] = useState(false); // ← 추가
   // ── 픽셀 UI 전용 상태 ──
   const [activeTab, setActiveTab] = useState("dashboard");
+    // 변경 후 — activeTier 저장값 무시하고 unlockedUnits 기준으로만 계산
   const [activeTier, setActiveTier] = useState(
-    parseInt(localStorage.getItem("activeTier")) ||
-      Math.ceil((parseInt(localStorage.getItem("unlockedUnits")) || 1) / 5) ||
-      1,
+    Math.ceil((parseInt(localStorage.getItem("unlockedUnits")) || 1) / 5) || 1
   );
 
   const TOTAL_TIERS = 3;
@@ -177,7 +176,11 @@ const UserMainPage = () => {
         const localProgress =
           parseInt(localStorage.getItem("unlockedUnits")) || 1;
         const finalProgress = Math.max(Number(progress) || 1, localProgress);
+        // 변경 후
         setUnlockedUnits(finalProgress);
+        const newTier = Math.ceil(finalProgress / 5) || 1;
+        setActiveTier(newTier);
+        localStorage.setItem("activeTier", newTier);
 
         const unitProgress = await getUnitProgress(
           Number(userId),

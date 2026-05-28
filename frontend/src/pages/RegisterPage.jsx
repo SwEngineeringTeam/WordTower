@@ -20,10 +20,15 @@ const RegisterPage = () => {
       const finalScore = dontKnowScore ? null : Number(toeicScore);
 
       // 💡 백엔드로 점수(finalScore)까지 함께 전송합니다.
-      await register(email, password, nickname, finalScore);
-
+            
+      // 변경 후
+      const result = await register(email, password, nickname, finalScore);
+      // 백엔드가 unlockedUnits 반환하면 저장, 없으면 1
+      const startUnit = result?.unlockedUnits || 1;
+      localStorage.setItem("unlockedUnits", startUnit);
+      localStorage.setItem("activeTier", Math.ceil(startUnit / 5) || 1);
       alert("회원가입 및 온보딩이 완료되었습니다! 로그인 페이지로 이동합니다.");
-      navigate("/login"); // 가입 성공 시 로그인 페이지로 이동
+      navigate("/login");
     } catch (err) {
       alert(err);
     }
