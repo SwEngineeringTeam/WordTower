@@ -304,9 +304,6 @@ const UserMainPage = () => {
           >
             내 프로필
           </button>
-          <button className="hdr-btn">설정</button>
-          <button className="hdr-btn">나의 단어장</button>
-          <button className="hdr-btn">복습하기</button>
           {/* ← 여기서부터 추가 */}
           {localStorage.getItem("email") === "user@test.com" && (
             <>
